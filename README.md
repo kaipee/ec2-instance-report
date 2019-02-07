@@ -43,6 +43,8 @@ Provide multi/single-region options
 * assign user input to variable
 * loop over array of choices and report on each chosen region
 
+Group by Region then instance state (sort by State Transition Date old>new)
+
 Print to stdout in JSON or Table format
 
 Provide a total per region
