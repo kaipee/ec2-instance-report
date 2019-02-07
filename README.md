@@ -8,8 +8,8 @@ A Boto3 script to query EC2 and report any potentially abandoned instances
 
 This script requires the following packages.
 
-* python
-* boto3
+* [python 3](https://www.python.org/downloads/)
+* [boto3](https://github.com/boto/boto3)
 
 This script uses access keys from IAM role 'ec2report'. The keys are expected to be located in `~/.aws/credentials`.
 
@@ -28,3 +28,23 @@ aws_secret_access_key=[AWS_SECRET]
 ```
 sudo chmod 600 ~/.aws/credentials
 ```
+
+
+# TODO
+
+~~Use a restricted IAM role - do not use individual credentials!!~~
+
+Report from all regions by default
+* return a list of all regions
+* loop over each available region and report ec2 instances within
+
+Provide multi/single-region options
+* Print available choices and take user input
+* assign user input to variable
+* loop over array of choices and report on each chosen region
+
+Print to stdout in JSON or Table format
+
+Provide a total per region
+
+Export to CSV report : reports/{MONTH_YEAR}/{datestamp}_{REGIONS}.csv
