@@ -18,9 +18,10 @@ for region in region_list:
     )
     for instance in instances:
         name = ''               # Initialise the variable : name
-        state = ''                # Initialise the variable : state
+#        state = ''                # Initialise the variable : state
         tags = {}               # Initialise the array : tags
         for tag in instance.tags:
             if (tag['Key'] == 'Name') or (tag['Key'] == 'name'):                # Check for any tags with a value of Name or name
                 name = tag['Value']               # Set name variable to be equal to the value of the Name/name tag
-        print(region + " : " + name + " (" + instance.id + ") ")                # Print the filtered instances formatted with the region followed by instance name
+            state = instance.state['Name']
+        print(region + " : " + name + " (" + instance.id + ") " + state)                # Print the filtered instances formatted with the region followed by instance name
