@@ -19,8 +19,8 @@ for region in region_list:
     for instance in instances:
         name = ''               # Initialise the variable : name
         state = ''                # Initialise the variable : state
-        tags = {}               # Initialise the array : tags
         tags = instance.tags
+
         if tags is not None:
             for tag in tags:
                 if 'Name' in tag['Key']:                # Check for any tags with a value of Name or name
@@ -29,5 +29,15 @@ for region in region_list:
                     owner = tag['Value']
                 if 'Project' in tag['Key']:
                     project = tag['Value']
-        state = instance.state['Name']
-        print(region + " : " + name + " (" + instance.id + ") OWNER: " + owner  + " PROJECT: " + project + " STATE: " + state)                # Print the filtered instances formatted with the region followed by instance name
+
+        if instance.state['Name'] is not None:
+            state = instance.state['Name']
+        else:
+            state = 'not found'
+
+        if instance.private_ip_address is not None:
+            private_ip = instance.private_ip_address
+        else:
+            private_ip = 'Not found'
+
+        print(region + " : " + name + " (" + instance.id + ") PRIVATE_IP: " + private_ip + " OWNER: " + owner  + " PROJECT: " + project + " STATE: " + state)                # Print the filtered instances formatted with the region followed by instance name
