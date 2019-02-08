@@ -20,10 +20,8 @@ for region in region_list:
         ]
     )
     for instance in instances:
-        name = ''   # Initialise the variable : name
-        state = ''    # Initialise the variable : state
+        # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
         tags = instance.tags
-
         if tags is not None:
             for tag in tags:
                 key = tag['Key']
@@ -70,8 +68,13 @@ for region in region_list:
             'Launch Time': instance.launch_time
             }
 
+template = "{Name:10}|{Type:10}|{Lifecycle:10}"
+print(template.format(Name="Name", Type="Type", Lifecycle="Lifecycle"))
 attributes = ['Name', 'Type', 'Lifecycle', 'Owner', 'State', 'Private IP', 'Public IP', 'Launch Time']
 for instance_id, instance in ec2data.items():
     for key in attributes:
-        print("{0}: {1}".format(key, instance[key]))
-    print("------")
+        print(template.format(*key))
+#for instance_id, instance in ec2data.items():
+#    for key in attributes:
+#        print("{0:10}|{1:10}".format(key, instance[key]))
+#    print("------")
