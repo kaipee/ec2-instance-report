@@ -25,5 +25,9 @@ for region in region_list:
             for tag in tags:
                 if 'Name' in tag['Key']:                # Check for any tags with a value of Name or name
                     name = tag['Value']               # Set name variable to be equal to the value of the Name/name tag
+                if 'Owner' in tag['Key']:
+                    owner = tag['Value']
+                if 'Project' in tag['Key']:
+                    project = tag['Value']
         state = instance.state['Name']
-        print(region + " : " + name + " (" + instance.id + ") " + state)                # Print the filtered instances formatted with the region followed by instance name
+        print(region + " : " + name + " (" + instance.id + ") OWNER: " + owner  + " PROJECT: " + project + " STATE: " + state)                # Print the filtered instances formatted with the region followed by instance name
