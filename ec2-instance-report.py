@@ -3,7 +3,7 @@ import os
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
-os.environ['AWS_PROFILE'] = "ec2report"               # Define which profile to connect with
+os.environ['AWS_PROFILE'] = 'ec2report'               # Define which profile to connect with
 session = boto3.Session(profile_name='ec2report')               # Create a boto3 session using the defined profile
 
 # Obtain all publicly available regions
@@ -18,10 +18,12 @@ for region in region_list:
     )
     for instance in instances:
         name = ''               # Initialise the variable : name
-#        state = ''                # Initialise the variable : state
+        state = ''                # Initialise the variable : state
         tags = {}               # Initialise the array : tags
-        for tag in instance.tags:
-            if (tag['Key'] == 'Name') or (tag['Key'] == 'name'):                # Check for any tags with a value of Name or name
-                name = tag['Value']               # Set name variable to be equal to the value of the Name/name tag
-            state = instance.state['Name']
+        tags = instance.tags
+        if tags is not None:
+            for tag in tags:
+                if 'Name' in tag['Key']:                # Check for any tags with a value of Name or name
+                    name = tag['Value']               # Set name variable to be equal to the value of the Name/name tag
+        state = instance.state['Name']
         print(region + " : " + name + " (" + instance.id + ") " + state)                # Print the filtered instances formatted with the region followed by instance name
