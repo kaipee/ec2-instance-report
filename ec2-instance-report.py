@@ -84,8 +84,7 @@ for region in region_list:
             }
 
         # Print results line by line
-        #print(region + ' : ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + name + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
-        print(region + ' : ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + name + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
+        print(region + ' : ' + name + ', ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
 
 '''
 # Print results as a table
