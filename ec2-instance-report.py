@@ -36,6 +36,8 @@ for region in region_list:
             owner = "NOT SET"
             project = "NOT SET"
 
+        inst_id = instance.id
+
         if instance.state['Name'] is not None:
             state = instance.state['Name']
         else:
@@ -44,7 +46,7 @@ for region in region_list:
         if instance.instance_lifecycle is not None:
             lifecycle = instance.instance_lifecycle
         else:
-            lifecycle = 'Scheduled'
+            lifecycle = 'Scheduled'   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
 
         if instance.private_ip_address is not None:
             private_ip = instance.private_ip_address
@@ -56,25 +58,50 @@ for region in region_list:
         else:
             public_ip = 'NONE'
 
+        inst_type = instance.instance_type
+
+        if instance.launch_time is not None:
+            launch_time = instance.launch_time
+        else:
+            launch_time = 'UNKNOWN'
+
+        if instance.state_transition_reason:
+            transition = instance.state_transition_reason
+        else:
+            transition = 'UNKNOWN'
+
         # Add instance info to a dictionary         
         ec2data[instance.id] = { 
             'Name': name,
-            'Type': instance.instance_type,
+            'Type': inst_type,
             'Lifecycle': lifecycle,
             'Owner' : owner,
             'State': state,
             'Private IP': private_ip,
             'Public IP': public_ip,
-            'Launch Time': instance.launch_time
+            'Launch Time': launch_time,
+            'Transition Reason' : transition
             }
 
+        # Print results line by line
+        #print(region + ' : ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + name + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
+        print(region + ' : ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + state + ', ' + transition + ', ' + name + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
+
+'''
+# Print results as a table
 template = "{Name:10}|{Type:10}|{Lifecycle:10}"
 print(template.format(Name="Name", Type="Type", Lifecycle="Lifecycle"))
 attributes = ['Name', 'Type', 'Lifecycle', 'Owner', 'State', 'Private IP', 'Public IP', 'Launch Time']
 for instance_id, instance in ec2data.items():
     for key in attributes:
         print(template.format(*key))
-#for instance_id, instance in ec2data.items():
-#    for key in attributes:
-#        print("{0:10}|{1:10}".format(key, instance[key]))
-#    print("------")
+'''
+
+'''
+# Print results in blocks
+attributes = ['Name', 'Type', 'Lifecycle', 'Owner', 'State', 'Private IP', 'Public IP', 'Launch Time']
+for instance_id, instance in ec2data.items():
+    for key in attributes:
+        print("{0:10}|{1:10}".format(key, instance[key]))
+    print("------")
+'''
