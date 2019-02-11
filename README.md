@@ -37,7 +37,7 @@ Take earguments in the following format
 | Flag | Argument | Descritpion | Defaults |
 | --- | --- | --- | --- |
 | **-r** | **--region** | Take one or more regions as input | List all regions) |
-| **-s** | **--state** | Take one or more expected values<br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
+| **-s** | **--state** | Take one or more expected values<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
 
 * pending
 * running
