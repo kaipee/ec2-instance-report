@@ -21,7 +21,7 @@ for region in region_list:
     ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
     instances = ec2.instances.filter(   # Filter the list of returned instances
         Filters=[
-            {'Name': 'instance-state-name', 'Values': ['stopped', 'running']},    # Return only instances that are stopped or running
+#            {'Name': 'instance-state-name', 'Values': ['stopped', 'running']},    # Return only instances that are stopped or running
         ]
     )
     for instance in instances:
@@ -37,16 +37,16 @@ for region in region_list:
                 if str.lower(key) == 'project':
                     project = tag['Value']
         else:   # Set default values if Tag is not present
-            name = "NOT SET"
-            owner = "NOT SET"
-            project = "NOT SET"
+            name = "NO_NAME"
+            owner = "NO_OWNER"
+            project = "NO_PROJECT"
 
         inst_id = instance.id
 
         if instance.state['Name']:
             state = instance.state['Name']
         else:
-            state = 'NOT SET'
+            state = 'NO_STATE'
 
         if instance.instance_lifecycle:
             lifecycle = instance.instance_lifecycle
@@ -56,24 +56,24 @@ for region in region_list:
         if instance.private_ip_address:
             private_ip = instance.private_ip_address
         else:
-            private_ip = 'NONE'
+            private_ip = 'NO_PRV_IP'
 
         if instance.public_ip_address:
             public_ip = instance.public_ip_address
         else:
-            public_ip = 'NONE'
+            public_ip = 'NO_PUB_IP'
 
         inst_type = instance.instance_type
 
         if instance.launch_time:
             launch_time = instance.launch_time.strftime("%m/%d/%Y %H:%M:%S")
         else:
-            launch_time = 'UNKNOWN'
+            launch_time = 'NO_LAUNCH'
 
         if instance.state_transition_reason:
             transition = instance.state_transition_reason
         else:
-            transition = 'UNKNOWN'
+            transition = 'NO_TRANS'
 
         # Add instance info to a dictionary         
         ec2data[instance.id] = { 
