@@ -1,6 +1,11 @@
 from collections import defaultdict
 import boto3
 import os
+import argparse
+
+# Make the sript user-friendly by providing some arguments and help options
+parser = argparse.ArgumentParser()
+parser.parse_args()
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)

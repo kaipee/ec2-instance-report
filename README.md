@@ -32,11 +32,21 @@ sudo chmod 600 ~/.aws/credentials
 
 # TODO
 
+Take earguments in the following format
+**-r --region** : take one or more regions as input (default to all regions)
+**-s --state** : take one or more expected values (all by default; or from the below list)
+* pending
+* running
+* shutting-down
+* terminated
+* stopping
+* stopped
+
 ~~Use a restricted IAM role - do not use individual credentials!!~~
 
-Report from all regions by default
-* return a list of all regions
-* loop over each available region and report ec2 instances within
+~~Report from all regions by default~~
+~~* return a list of all regions~~
+~~* loop over each available region and report ec2 instances within~~
 
 Provide multi/single-region options
 * Print available choices and take user input
