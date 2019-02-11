@@ -36,7 +36,7 @@ Take arguments in the following format (all arguments are cumulative)
 
 ## Search Filters
 | Flag | Argument | Description | Defaults |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 | **-r** | **--region** | Take one or more regions as search filter | List all regions |
 | **-s** | **--state** | Take one or more __expected values__<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
 | **-t** | **--type** | Take one or more instance types as search filter | List all types |
@@ -45,7 +45,7 @@ Take arguments in the following format (all arguments are cumulative)
 
 ## Display Options
 | Flag | Argument | Description | Defaults |
-| --- | --- | --- | --- |
+| :--- | :--- | :--- | :--- |
 
 ~~Use a restricted IAM role - do not use individual credentials!!~~
 
