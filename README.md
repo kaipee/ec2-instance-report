@@ -32,19 +32,20 @@ sudo chmod 600 ~/.aws/credentials
 
 # TODO
 
-Take earguments in the following format
+Take arguments in the following format (all arguments are cumulative)
 
-| Flag | Argument | Descritpion | Defaults |
+## Search Filters
+| Flag | Argument | Description | Defaults |
 | --- | --- | --- | --- |
-| **-r** | **--region** | Take one or more regions as input | List all regions) |
-| **-s** | **--state** | Take one or more expected values<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
+| **-r** | **--region** | Take one or more regions as search filter | List all regions |
+| **-s** | **--state** | Take one or more __expected values__<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
+| **-t** | **--type** | Take one or more instance types as search filter | List all types |
+| **-i** | **--id** | Take one or more instance ids as search filter | List all instance ids |
+| ** 
 
-* pending
-* running
-* shutting-down
-* terminated
-* stopping
-* stopped
+## Display Options
+| Flag | Argument | Description | Defaults |
+| --- | --- | --- | --- |
 
 ~~Use a restricted IAM role - do not use individual credentials!!~~
 
