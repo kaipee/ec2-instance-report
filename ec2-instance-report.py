@@ -22,7 +22,7 @@ for region in region_list:
     for instance in instances:
         # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
         tags = instance.tags
-        if tags is not None:
+        if tags :
             for tag in tags:
                 key = tag['Key']
                 if str.lower(key) == 'name':    # Check for any tags with a value of Name or name
@@ -38,30 +38,30 @@ for region in region_list:
 
         inst_id = instance.id
 
-        if instance.state['Name'] is not None:
+        if instance.state['Name']:
             state = instance.state['Name']
         else:
             state = 'NOT SET'
 
-        if instance.instance_lifecycle is not None:
+        if instance.instance_lifecycle:
             lifecycle = instance.instance_lifecycle
         else:
             lifecycle = 'Scheduled'   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
 
-        if instance.private_ip_address is not None:
+        if instance.private_ip_address:
             private_ip = instance.private_ip_address
         else:
             private_ip = 'NONE'
 
-        if instance.public_ip_address is not None:
+        if instance.public_ip_address:
             public_ip = instance.public_ip_address
         else:
             public_ip = 'NONE'
 
         inst_type = instance.instance_type
 
-        if instance.launch_time is not None:
-            launch_time = instance.launch_time
+        if instance.launch_time:
+            launch_time = instance.launch_time.strftime("%m/%d/%Y %H:%M:%S")
         else:
             launch_time = 'UNKNOWN'
 
@@ -85,7 +85,7 @@ for region in region_list:
 
         # Print results line by line
         #print(region + ' : ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + name + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
-        print(region + ' : ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + state + ', ' + transition + ', ' + name + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
+        print(region + ' : ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + name + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
 
 '''
 # Print results as a table
