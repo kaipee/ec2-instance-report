@@ -34,9 +34,10 @@ sudo chmod 600 ~/.aws/credentials
 
 Take earguments in the following format
 
-**-r --region** : take one or more regions as input (default to all regions)
-
-**-s --state** : take one or more expected values (all by default; or from the below list)
+| Flag | Argument | Descritpion | Defaults |
+| --- | --- | --- | --- |
+| **-r** | **--region** | Take one or more regions as input | List all regions) |
+| **-s** | **--state** | Take one or more expected values<br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
 
 * pending
 * running
