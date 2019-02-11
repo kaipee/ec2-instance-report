@@ -64,3 +64,24 @@ Print to stdout in JSON or Table format
 Provide a total per region
 
 Export to CSV report : reports/{MONTH_YEAR}/{datestamp}_{REGIONS}.csv
+
+## Expected arguments
+```
+[Filters]
+region is [csl]
+state is [csl]
+type is [csl]
+isntance id is [csl]
+name contains (case insensitive)
+name is exactly (case insensitive)
+owner contains (case insensitive)
+owner is exactly (case insensitive)
+project contains (case insensitive)
+project is exctly (case insensitive)
+private ip is exactly
+public ip is exactly
+
+[Display options]
+lifecycle on (default off)
+transition on (default off)
+```
