@@ -40,11 +40,10 @@ def get_region():
     return region_list
     
 def get_instances():
-    get_region()
     # Declare dict to be used for storing instance details later
     ec2data = defaultdict()
     
-    for region in region_list:
+    for region in arg_region:
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
         instances = ec2.instances.filter(   # Filter the list of returned instances
             Filters=[
@@ -117,6 +116,12 @@ def get_instances():
     
             # Print results line by line
             print(region + ' : ' + name + ', ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
+
+# Check if --region set and assign variable values
+if args.region:
+    arg_region = args.region
+else:
+    arg_region = get_region()
 
 # Print print all available regions
 if args.region_print:
