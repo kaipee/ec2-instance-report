@@ -10,17 +10,18 @@ parser.add_argument("-e", "--elastic-ip", type=str, help="All instances matching
 parser.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
 parser.add_argument("-i", "--id", type=str, help="All instances matching ID, entered as a comma separated list. ALWAYS DISPLAYED.")
 parser.add_argument("-l", "--launchtime", help="Display the instance launch time.", action="store_true")
-parser.add_argument("-n", "--name", type=str, help="(Loose) All instances where 'Name' tag contains NAME, entered as a comma separated list.")
-parser.add_argument("-N", "--name-exact", type=str, help="(Strict) All instances where 'Name' tag matches NAME exactly, entered as a comma separated list.")
+parser.add_argument("-n", "--name", type=str, help="(Loose) All instances where 'Name' tag contains NAME, accepts multiple values.")
+parser.add_argument("-N", "--name-exact", type=str, help="(Strict) All instances where 'Name' tag matches NAME exactly, accepts multiple values.")
+parser.add_argument("-x", "--custom-tag", action='append', help="(Loose) All instances where tag is like CUSTOM_TAG, accepts multiple values.")
 parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where 'Owner' tag contains OWNER, entered as a comma separated list. ALWAYS DISPLAYED.")
 parser.add_argument("-O", "--owner-exact", type=str, help="(Strict) All instances where 'Owner' tag matches OWNER exactly, entered as a comma separated list.")
-parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, entered as a comma separated list. ALWAYS DISPLAYED.")
-parser.add_argument("-P", "--project-exact", type=str, help="(Strict) All instances where 'Project' tag matches PROJECT exactly, entered as a comma separated list.")
-parser.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, multiple value allowed. ALWAYS DISPLAYED.")
+parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, accpets multiple values. ALWAYS DISPLAYED.")
+parser.add_argument("-P", "--project-exact", type=str, help="(Strict) All instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
+parser.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, accepts multiple values. ALWAYS DISPLAYED.")
 parser.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
 state_args = ['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated']
-parser.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, multiple values allowed. ALWAYS DISPLAYED.")
-parser.add_argument("-t", "--transition", help="", action="store_true")
+parser.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, accepts multiple values. ALWAYS DISPLAYED.")
+parser.add_argument("-t", "--transition", help="Display last state transition details if availale.", action="store_true")
 parser.add_argument("--test", help="Debug, print all args", action="store_true")
 args = parser.parse_args()
 
@@ -29,10 +30,15 @@ if args.test:
     print(args)
     print("\n")
 
-if args.state:
-    arg_state = args.state
+if args.custom_tag:
+    arg_custom_tag = {'Name': 'tag-key', 'Values': args.custom_tag}   # Dirty hack to filter custom Tag keys
 else:
-    arg_state = state_args
+    arg_custom_tag = {}
+
+if args.state:
+    arg_state = args.state    # Set the instance state depending on -s --state argument
+else:
+    arg_state = state_args    # Set the instance state to a default list of all states
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
@@ -52,8 +58,10 @@ def get_instances():
     for region in arg_region:
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
         instances = ec2.instances.filter(   # Filter the list of returned instances
+            # List of available filters : https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
             Filters=[
                 {'Name': 'instance-state-name', 'Values': arg_state},    # Return only instances that are stopped or running
+                arg_custom_tag
             ]
         )
         for instance in instances:
@@ -72,6 +80,12 @@ def get_instances():
                     if str.lower(key) == 'project':
                         project = tag['Value']
     
+                    if args.custom_tag:   # Loop over the list of custom tags if present
+                        for custom_tag in args.custom_tag:
+                            if tag['Key'] == custom_tag:
+                                print(custom_tag + " : " + tag['Value'])
+                                ctags[tag['Key']] = tag['Value']
+
             inst_id = instance.id
     
             if instance.state['Name']:
@@ -120,6 +134,8 @@ def get_instances():
                 }
     
             # Print results line by line
+            #for data in ec2data:
+            #    print(data[3])
             print(region + ' : ' + name + ', ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
 
 # Check if --region set and assign variable values
@@ -142,6 +158,7 @@ if args.region_print:
 
 # Go ahead and output the instance details if not checking for a list of regions
 if not args.region_print:
+    ctags = {}
     get_instances()
 
 '''
