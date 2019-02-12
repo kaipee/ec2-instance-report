@@ -18,7 +18,8 @@ parser.add_argument("-p", "--project", type=str, help="(Loose) All instances whe
 parser.add_argument("-P", "--project-exact", type=str, help="(Strict) All instances where 'Project' tag matches PROJECT exactly, entered as a comma separated list.")
 parser.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, multiple value allowed. ALWAYS DISPLAYED.")
 parser.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
-parser.add_argument("-s", "--state", action='append', choices=['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated'], help="All instances with Instance State STATE, multiple values allowed. ALWAYS DISPLAYED.")
+state_args = ['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated']
+parser.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, multiple values allowed. ALWAYS DISPLAYED.")
 parser.add_argument("-t", "--transition", help="", action="store_true")
 parser.add_argument("--test", help="Debug, print all args", action="store_true")
 args = parser.parse_args()
@@ -27,6 +28,11 @@ args = parser.parse_args()
 if args.test:
     print(args)
     print("\n")
+
+if args.state:
+    arg_state = args.state
+else:
+    arg_state = state_args
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
@@ -47,12 +53,15 @@ def get_instances():
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
         instances = ec2.instances.filter(   # Filter the list of returned instances
             Filters=[
-    #            {'Name': 'instance-state-name', 'Values': ['stopped', 'running']},    # Return only instances that are stopped or running
+                {'Name': 'instance-state-name', 'Values': arg_state},    # Return only instances that are stopped or running
             ]
         )
         for instance in instances:
             # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
             tags = instance.tags
+            name = "NO_NAME"
+            owner = "NO_OWNER"
+            project = "NO_PROJECT"
             if tags :
                 for tag in tags:
                     key = tag['Key']
@@ -62,10 +71,6 @@ def get_instances():
                         owner = tag['Value']
                     if str.lower(key) == 'project':
                         project = tag['Value']
-            else:   # Set default values if Tag is not present
-                name = "NO_NAME"
-                owner = "NO_OWNER"
-                project = "NO_PROJECT"
     
             inst_id = instance.id
     
@@ -125,12 +130,15 @@ else:
 
 # Print print all available regions
 if args.region_print:
-    print_instances = False
     get_region()
+    print('------------------')
     print('Available regions:')
     print('------------------')
     for region in region_list:
         print(region)
+    print('------------------')
+    print('Retrieved from AWS')
+    print('------------------')
 
 # Go ahead and output the instance details if not checking for a list of regions
 if not args.region_print:
