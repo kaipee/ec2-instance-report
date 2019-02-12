@@ -35,8 +35,8 @@ sudo chmod 600 ~/.aws/credentials
 Take arguments in the following format (all arguments are cumulative)
 
 ## Search Filters
-| Short | Long | Description | Defaults |
-| :--- | :--- | :--- | :--- |
+| Short | Long | Description | Defaults | Display |
+| :--- | :--- | :--- | :--- | :--- |
 | **-e** | **--public {filter}** | Filter results matching exactly the elastic IP (Public IP) | List all instances with or without EIP |
 | **-f** | **--private {filter}** | Filter results matching exactly the Private IP | List all instances with or without Private IP |
 | **-i** | **--id {filter}** | Take one or more instance ids as search filter | List all instance ids |
@@ -51,8 +51,8 @@ Take arguments in the following format (all arguments are cumulative)
 | **-t** | **--type {filter}** | Take one or more instance types as search filter | List all types |
 
 ## Display Options
-| Short | Long | Description | Defaults |
-| :--- | :--- | :--- | :--- |
+| Short | Long | Description | Defaults | Display |
+| :--- | :--- | :--- | :--- | :--- |
 | **-l** | **--lifecycle** | Display instance lifecycle type (spot or scheduled) | Do not display |
 | **-t** | **--transition** | Display last transition state details if present | Do not display |
 
