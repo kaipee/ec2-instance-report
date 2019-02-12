@@ -4,11 +4,11 @@ import os
 import argparse
 
 # Make the sript user-friendly by providing some arguments and help options
-parser = argparse.ArgumentParser()
-parser.add_argument("-v", "--verbose", help="Enable verbose output")
+parser = argparse.ArgumentParser(description="Retrieve a list of AWS EC2 instances.")
+parser.add_argument("-", "--", help="")
 args = parser.parse_args()
-if args.verbose:
-    print(args.verbose)
+if args.__:
+    print(args.__)
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
@@ -18,6 +18,7 @@ session = boto3.Session(profile_name='ec2report')   # Create a boto3 session usi
 # Obtain all publicly available regions
 region_list = session.get_available_regions('ec2')
 
+# Declare dict to be used for storing instance details later
 ec2data = defaultdict()
 
 for region in region_list:

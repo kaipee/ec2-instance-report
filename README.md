@@ -37,9 +37,8 @@ Take arguments in the following format (all arguments are cumulative)
 ## Search Filters
 | Short | Long | Description | Defaults |
 | :--- | :--- | :--- | :--- |
-| **-r** | **--region {filter}** | Take one or more regions as search filter | List all regions |
-| **-s** | **--state {filter}** | Take one or more __expected values__<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
-| **-t** | **--type {filter}** | Take one or more instance types as search filter | List all types |
+| **-e** | **--public {filter}** | Filter results matching exactly the elastic IP (Public IP) | List all instances with or without EIP |
+| **-f** | **--private {filter}** | Filter results matching exactly the Private IP | List all instances with or without Private IP |
 | **-i** | **--id {filter}** | Take one or more instance ids as search filter | List all instance ids |
 | **-n** | **--name {filter}** | Take one ore more Name tags as a search filter (contains) | List all instance Name tags |
 | **-N** | **--name-exact {filter}** | Take one ore more Name tags as a search filter (exact) | List all instance Name tags |
@@ -47,8 +46,9 @@ Take arguments in the following format (all arguments are cumulative)
 | **-O** | **--owner-exact {filter}** | Take one ore more Owner tags as a search filter (exact) | List all instance Owner tags |
 | **-p** | **--project {filter}** | Take one ore more Project tags as a search filter (contains) | List all instance Project tags |
 | **-P** | **--project-exact {filter}** | Take one ore more Project tags as a search filter (exact) | List all instance Project tags |
-| **-e** | **--public {filter}** | Filter results matching exactly the elastic IP (Public IP) | List all instances with or without EIP |
-| **-f** | **--private {filter}** | Filter results matching exactly the Private IP | List all instances with or without Private IP |
+| **-r** | **--region {filter}** | Take one or more regions as search filter | List all regions |
+| **-s** | **--state {filter}** | Take one or more __expected values__<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
+| **-t** | **--type {filter}** | Take one or more instance types as search filter | List all types |
 
 ## Display Options
 | Short | Long | Description | Defaults |
