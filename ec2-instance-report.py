@@ -5,7 +5,10 @@ import argparse
 
 # Make the sript user-friendly by providing some arguments and help options
 parser = argparse.ArgumentParser()
-parser.parse_args()
+parser.add_argument("-v", "--verbose", help="Enable verbose output")
+args = parser.parse_args()
+if args.verbose:
+    print(args.verbose)
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)

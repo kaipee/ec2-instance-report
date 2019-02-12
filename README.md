@@ -35,7 +35,7 @@ sudo chmod 600 ~/.aws/credentials
 Take arguments in the following format (all arguments are cumulative)
 
 ## Search Filters
-| Flag | Argument | Description | Defaults |
+| Short | Long | Description | Defaults |
 | :--- | :--- | :--- | :--- |
 | **-r** | **--region {filter}** | Take one or more regions as search filter | List all regions |
 | **-s** | **--state {filter}** | Take one or more __expected values__<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
@@ -51,7 +51,7 @@ Take arguments in the following format (all arguments are cumulative)
 | **-f** | **--private {filter}** | Filter results matching exactly the Private IP | List all instances with or without Private IP |
 
 ## Display Options
-| Flag | Argument | Description | Defaults |
+| Short | Long | Description | Defaults |
 | :--- | :--- | :--- | :--- |
 | **-l** | **--lifecycle** | Display instance lifecycle type (spot or scheduled) | Do not display |
 | **-t** | **--transition** | Display last transition state details if present | Do not display |
