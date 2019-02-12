@@ -16,7 +16,7 @@ parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where
 parser.add_argument("-O", "--owner-exact", type=str, help="(Strict) All instances where 'Owner' tag matches OWNER exactly, entered as a comma separated list.")
 parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, entered as a comma separated list. ALWAYS DISPLAYED.")
 parser.add_argument("-P", "--project-exact", type=str, help="(Strict) All instances where 'Project' tag matches PROJECT exactly, entered as a comma separated list.")
-parser.add_argument("-r", "--region", type=str, help="All instances in Region(s) REGION, entered as a comma separated list. ALWAYS DISPLAYED.")
+parser.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, multiple value allowed. ALWAYS DISPLAYED.")
 parser.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
 parser.add_argument("-s", "--state", action='append', choices=['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated'], help="All instances with Instance State STATE, multiple values allowed. ALWAYS DISPLAYED.")
 parser.add_argument("-t", "--transition", help="", action="store_true")
@@ -26,6 +26,7 @@ args = parser.parse_args()
 ## CONFIRM THE CURRENT VALUES OF EACH ARGUMENT FOR TESTING
 if args.test:
     print(args)
+    print("\n")
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
@@ -33,12 +34,13 @@ os.environ['AWS_PROFILE'] = 'ec2report'   # Define which profile to connect with
 session = boto3.Session(profile_name='ec2report')   # Create a boto3 session using the defined profile
 
 def get_region():
-    # Obtain all publicly available regions
     global region_list
+    # Obtain all publicly available regions
     region_list = session.get_available_regions('ec2')
     return region_list
     
 def get_instances():
+    get_region()
     # Declare dict to be used for storing instance details later
     ec2data = defaultdict()
     
@@ -118,11 +120,16 @@ def get_instances():
 
 # Print print all available regions
 if args.region_print:
+    print_instances = False
     get_region()
     print('Available regions:')
     print('------------------')
     for region in region_list:
         print(region)
+
+# Go ahead and output the instance details if not checking for a list of regions
+if not args.region_print:
+    get_instances()
 
 '''
 # Print results as a table
