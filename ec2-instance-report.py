@@ -5,10 +5,20 @@ import argparse
 
 # Make the sript user-friendly by providing some arguments and help options
 parser = argparse.ArgumentParser(description="Retrieve a list of AWS EC2 instances.")
-parser.add_argument("-", "--", help="")
+parser.add_argument("-e", "--public", help="All instances matching the Elastic IP")
+parser.add_argument("-f", "--private", help="All instances matching the Private IP")
+parser.add_argument("-i", "--id", help="All instances matching Instance ID, entered as a comma separated list.", type=str)
+parser.add_argument("-n", "--name", help="(Loose) All instances where 'Name' tag contains {}, entered as a comma separated list.", type=str)
+parser.add_argument("-N", "--name-exact", help="(Strict) All instances where 'Name' tag matches {} exactly, entered as a comma separated list.", type=str)
+parser.add_argument("-o", "--owner", help="(Loose) All instances where 'Owner' tag contains {}, entered as a comma separated list.", type=str)
+parser.add_argument("-O", "--owner-exact", help="(Strict) All instances where 'Owner' tag matches {} exactly, entered as a comma separated list.", type=str)
+parser.add_argument("-p", "--project", help="(Loose) All instances where 'Project' tag contains {}, entered as a comma separated list.", type=str)
+parser.add_argument("-P", "--project-exact", help="(Strict) All instances where 'Project' tag matches {} exactly, entered as a comma separated list.", type=str)
+parser.add_argument("-r", "--region", help="All instances in Region(s) {}, entered as a comma separated list.", type=str)
+parser.add_argument("-s", "--state", help="All instances with Instance State {}, entered as a comma separated list. Allowed values: pending,running,shutting-down,terminated,stopping,stopped", type=str)
 args = parser.parse_args()
-if args.__:
-    print(args.__)
+#if args.__:
+#    print(args.__)
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
