@@ -23,22 +23,40 @@ state_args = ['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'ter
 parser.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, accepts multiple values. ALWAYS DISPLAYED.")
 parser.add_argument("-t", "--transition", help="Display last state transition details if availale.", action="store_true")
 parser.add_argument("--test", help="Debug, print all args", action="store_true")
+global args
 args = parser.parse_args()
-
-if args.custom_tag:
-    arg_custom_tag = {'Name': 'tag-key', 'Values': args.custom_tag}   # Dirty hack to filter custom Tag keys
-else:
-    arg_custom_tag = {}
-
-if args.state:
-    arg_state = args.state    # Set the instance state depending on -s --state argument
-else:
-    arg_state = state_args    # Set the instance state to a default list of all states
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
 os.environ['AWS_PROFILE'] = 'ec2report'   # Define which profile to connect with
 session = boto3.Session(profile_name='ec2report')   # Create a boto3 session using the defined profile
+
+def get_filters():
+    filters = {}
+    
+    # Filter for custom tags if provided
+    if args.custom_tag:
+       # arg_custom_tag = {'Name': 'tag-key', 'Values': args.custom_tag}   # Dirty hack to filter custom Tag keys
+        filter_custag = {
+        'Name': 'tag-key',
+        'Values': args.custom_tag
+        }
+        filters["cust_tag"] = filter_custag
+    
+    # Filter for instance state (default to all)
+    if args.state:
+        arg_state = args.state    # Set the instance state depending on -s --state argument
+    else:
+        arg_state = state_args    # Set the instance state to a default list of all states
+    filter_state = {
+    'Name': 'instance-state-name',
+    'Values': arg_state
+    }
+    filters["state"] = filter_state
+
+    # Return filters
+    for value in filters.values():
+        return value
 
 def get_region():
     global region_list
@@ -50,13 +68,13 @@ def get_instances():
     # Declare dict to be used for storing instance details later
     ec2data = defaultdict()
     
+    print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
     for region in arg_region:
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
         instances = ec2.instances.filter(   # Filter the list of returned instances
             # List of available filters : https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
             Filters=[
-                {'Name': 'instance-state-name', 'Values': arg_state},    # Return only instances that are stopped or running
-                arg_custom_tag
+                get_filters()
             ]
         )
         for instance in instances:
@@ -158,8 +176,8 @@ if args.region_print:
 else:
     # Go ahead and output the instance details if not checking for a list of regions
     ctags = {}
-    print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
     get_instances()
+#    get_filters()
 
 '''
 # Print results as a table
