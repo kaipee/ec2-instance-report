@@ -20,9 +20,9 @@ parser.add_argument("-OL", "--owner-exact-lower", action='append', help="(Strict
 parser.add_argument("-OU", "--owner-exact-upper", action='append', help="(Strict) All instances where 'OWNER' tag matches OWNER exactly, accepts multiple values.")
 parser.add_argument("-OS", "--owner-exact-sentence", action='append', help="(Strict) All instances where 'Owner' tag matches OWNER exactly, accepts multiple values.")
 #TODO : parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, accpets multiple values. ALWAYS DISPLAYED.")
-parser.add_argument("-PL", "--project-exact-lower", type=str, help="(Strict) All instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
-parser.add_argument("-PU", "--project-exact-upper", type=str, help="(Strict) All instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
-parser.add_argument("-PS", "--project-exact-sentence", type=str, help="(Strict) All instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
+parser.add_argument("-PL", "--project-exact-lower", action='append', help="(Strict) All instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
+parser.add_argument("-PU", "--project-exact-upper", action='append', help="(Strict) All instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
+parser.add_argument("-PS", "--project-exact-sentence", action='append', help="(Strict) All instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
 parser.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, accepts multiple values. ALWAYS DISPLAYED.")
 parser.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
 state_args = ['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated']
@@ -134,6 +134,33 @@ def get_filters():
         'Values': args.owner_exact_sentence
         }
         filters["owner_exact_sent"] = filter_owner_e_s
+
+    ###################################################################
+    # Tag : project|PROJECT|Project
+    ###################################################################
+    # Filter for Tag : project 
+    if args.project_exact_lower:
+        filter_project_e_l = {
+        'Name': 'tag:project',
+        'Values': args.project_exact_lower
+        }
+        filters["project_exact_low"] = filter_project_e_l
+
+    # Filter for Tag : PROJECT
+    if args.project_exact_upper:
+        filter_project_e_u = {
+        'Name': 'tag:PROJECT',
+        'Values': args.project_exact_upper
+        }
+        filters["project_exact_upp"] = filter_project_e_u
+
+    # Filter for Tag : Project
+    if args.project_exact_sentence:
+        filter_project_e_s = {
+        'Name': 'tag:Project',
+        'Values': args.project_exact_sentence
+        }
+        filters["project_exact_sent"] = filter_project_e_s
 
     ###################################################################
     
