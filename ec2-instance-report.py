@@ -25,11 +25,6 @@ parser.add_argument("-t", "--transition", help="Display last state transition de
 parser.add_argument("--test", help="Debug, print all args", action="store_true")
 args = parser.parse_args()
 
-## CONFIRM THE CURRENT VALUES OF EACH ARGUMENT FOR TESTING
-if args.test:
-    print(args)
-    print("\n")
-
 if args.custom_tag:
     arg_custom_tag = {'Name': 'tag-key', 'Values': args.custom_tag}   # Dirty hack to filter custom Tag keys
 else:
@@ -136,7 +131,12 @@ def get_instances():
             # Print results line by line
             #for data in ec2data:
             #    print(data[3])
-            print(region + ' : ' + name + ', ' + inst_id + ', ' + inst_type + ', ' + lifecycle + ', ' + launch_time + ', ' + state + ', ' + transition + ', ' + private_ip + ', ' + public_ip + ', ' + owner + ', ' + project)
+            print(region + "\t" + name + "\t" + inst_id + "\t" + inst_type + "\t" + lifecycle + "\t" + launch_time + "\t" + state + "\t" + transition + "\t" + private_ip + "\t" + public_ip + "\t" + owner + "\t" + project)
+
+## CONFIRM THE CURRENT VALUES OF EACH ARGUMENT FOR TESTING
+if args.test:
+    print(args)
+    print("\n")
 
 # Check if --region set and assign variable values
 if args.region:
@@ -144,7 +144,7 @@ if args.region:
 else:
     arg_region = get_region()
 
-# Print print all available regions
+# Print print all available regions if -R flag is set
 if args.region_print:
     get_region()
     print('------------------')
@@ -155,10 +155,10 @@ if args.region_print:
     print('------------------')
     print('Retrieved from AWS')
     print('------------------')
-
-# Go ahead and output the instance details if not checking for a list of regions
-if not args.region_print:
+else:
+    # Go ahead and output the instance details if not checking for a list of regions
     ctags = {}
+    print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
     get_instances()
 
 '''
