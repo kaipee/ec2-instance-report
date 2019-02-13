@@ -5,7 +5,7 @@ import argparse
 
 # Make the sript user-friendly by providing some arguments and help options
 parser = argparse.ArgumentParser(description="Retrieve a list of AWS EC2 instances.")
-parser.add_argument("-c", "--lifecycle", action='append', choices=['all', 'spot', 'scheduled'], type=str, help="All instances matching LIFECYCLE.")
+parser.add_argument("-c", "--lifecycle", action="store_true", help="All instances matching LIFECYCLE.")
 parser.add_argument("-e", "--elastic-ip", type=str, help="All instances matching the ELASTIC_IP.")
 parser.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
 parser.add_argument("-i", "--id", type=str, help="All instances matching ID, entered as a comma separated list. ALWAYS DISPLAYED.")
@@ -38,9 +38,17 @@ def get_filters():
     if args.lifecycle:
         filter_lifecycle = {
         'Name': 'instance-lifecycle',
-        'Values': args.lifecycle
+        'Values': ['spot']
         }
         filters["lifecycle"] = filter_lifecycle
+    
+    # Filter for lifecycle if provided
+    if args.elastic_ip:
+        filter_elasticip = {
+        'Name': 'network-interface.association.public-ip',
+        'Values': [args.elastic_ip]
+        }
+        filters["elasticip"] = filter_elasticip
     
     # Filter for custom tags if provided
     if args.custom_tag:
@@ -115,7 +123,7 @@ def get_instances():
     
             if instance.instance_lifecycle:
                 lifecycle = instance.instance_lifecycle
-            else:
+            elif instance.instance_lifecycle is None:
                 lifecycle = 'Scheduled'   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
     
             if instance.private_ip_address:
