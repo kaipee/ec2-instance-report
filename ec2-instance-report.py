@@ -15,33 +15,41 @@ session = boto3.Session(profile_name='ec2report')   # Create a boto3 session usi
 # Make the sript user-friendly by providing some arguments and help options
 # Search filters
 parser = argparse.ArgumentParser(description="Retrieve a list of AWS EC2 instances.")
-parser.add_argument("-c", "--lifecycle", action="store_true", help="All instances matching LIFECYCLE.")
-parser.add_argument("-e", "--elastic-ip", type=str, help="All instances matching the ELASTIC_IP.")
-parser.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
-parser.add_argument("-i", "--id", action='append', help="All instances matching ID, accepts multiple values. ALWAYS DISPLAYED.")
+
+g_filters = parser.add_argument_group('SEARCH FILTERS')
+g_display = parser.add_argument_group('DISPLAY OPTIONS')
+g_debug = parser.add_argument_group('DEBUG')
+
+# Search filters
+g_filters.add_argument("-c", "--lifecycle", action="store_true", help="All instances matching LIFECYCLE.")
+g_filters.add_argument("-e", "--elastic-ip", type=str, help="All instances matching the ELASTIC_IP.")
+g_filters.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
+g_filters.add_argument("-i", "--id", action='append', help="All instances matching ID, accepts multiple values. ALWAYS DISPLAYED.")
 #TODO : parser.add_argument("-nu", "--nameupper", type=str, help="(Loose) All instances where 'Name' tag contains NAME, accepts multiple values.")
-parser.add_argument("-NL", "--name-exact-lower", action='append', help="(Strict) All instances where 'name' tag matches NAME exactly, accepts multiple values.")
-parser.add_argument("-NU", "--name-exact-upper", action='append', help="(Strict) All instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
-parser.add_argument("-NS", "--name-exact-sentence", action='append', help="(Strict) All instances where 'Name' tag matches NAME exactly, accepts multiple values.")
-parser.add_argument("-x", "--custom-tag", action='append', help="(Loose) All instances where tag is like CUSTOM_TAG, accepts multiple values.")
+g_filters.add_argument("-NL", "--name-exact-lower", action='append', help="(Strict) All instances where 'name' tag matches NAME exactly, accepts multiple values.")
+g_filters.add_argument("-NU", "--name-exact-upper", action='append', help="(Strict) All instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
+g_filters.add_argument("-NS", "--name-exact-sentence", action='append', help="(Strict) All instances where 'Name' tag matches NAME exactly, accepts multiple values.")
 #TODO : parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where 'Owner' tag contains OWNER, entered as a comma separated list. ALWAYS DISPLAYED.")
-parser.add_argument("-OL", "--owner-exact-lower", action='append', help="(Strict) All instances where 'owner' tag matches OWNER exactly, accepts multiple values.")
-parser.add_argument("-OU", "--owner-exact-upper", action='append', help="(Strict) All instances where 'OWNER' tag matches OWNER exactly, accepts multiple values.")
-parser.add_argument("-OS", "--owner-exact-sentence", action='append', help="(Strict) All instances where 'Owner' tag matches OWNER exactly, accepts multiple values.")
+g_filters.add_argument("-OL", "--owner-exact-lower", action='append', help="(Strict) All instances where 'owner' tag matches OWNER exactly, accepts multiple values.")
+g_filters.add_argument("-OU", "--owner-exact-upper", action='append', help="(Strict) All instances where 'OWNER' tag matches OWNER exactly, accepts multiple values.")
+g_filters.add_argument("-OS", "--owner-exact-sentence", action='append', help="(Strict) All instances where 'Owner' tag matches OWNER exactly, accepts multiple values.")
 #TODO : parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, accpets multiple values. ALWAYS DISPLAYED.")
-parser.add_argument("-PL", "--project-exact-lower", action='append', help="(Strict) All instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
-parser.add_argument("-PU", "--project-exact-upper", action='append', help="(Strict) All instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
-parser.add_argument("-PS", "--project-exact-sentence", action='append', help="(Strict) All instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
-parser.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, accepts multiple values. ALWAYS DISPLAYED.")
-parser.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
+g_filters.add_argument("-PL", "--project-exact-lower", action='append', help="(Strict) All instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
+g_filters.add_argument("-PU", "--project-exact-upper", action='append', help="(Strict) All instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
+g_filters.add_argument("-PS", "--project-exact-sentence", action='append', help="(Strict) All instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
+g_filters.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, accepts multiple values. ALWAYS DISPLAYED.")
 state_args = ['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated']
-parser.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, accepts multiple values. ALWAYS DISPLAYED.")
+g_filters.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, accepts multiple values. ALWAYS DISPLAYED.")
+g_filters.add_argument("-x", "--custom-tag", action='append', help="(Loose) All instances where tag is like CUSTOM_TAG, accepts multiple values.")
+
 # Display options (value printed if argument passed)
-parser.add_argument("-l", "--launchtime", help="Display the instance launch time.", action="store_true")
-parser.add_argument("-t", "--transition", help="Display last state transition details if availale.", action="store_true")
+g_display.add_argument("-l", "--launchtime", help="Display the instance launch time.", action="store_true")
+g_display.add_argument("-t", "--transition", help="Display last state transition details if availale.", action="store_true")
+
 # Debug filters
-parser.add_argument("--debug-args", help="Debug, print all args", action="store_true")
-parser.add_argument("--debug-filters", help="Debug, print all filters", action="store_true")
+g_debug.add_argument("--debug-args", help="Debug, print all args", action="store_true")
+g_debug.add_argument("--debug-filters", help="Debug, print all filters", action="store_true")
+g_debug.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
 
 global args
 args = parser.parse_args()
