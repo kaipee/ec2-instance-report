@@ -16,9 +16,9 @@ parser.add_argument("-NU", "--name-exact-upper", action='append', help="(Strict)
 parser.add_argument("-NS", "--name-exact-sentence", action='append', help="(Strict) All instances where 'Name' tag matches NAME exactly, accepts multiple values.")
 parser.add_argument("-x", "--custom-tag", action='append', help="(Loose) All instances where tag is like CUSTOM_TAG, accepts multiple values.")
 #TODO : parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where 'Owner' tag contains OWNER, entered as a comma separated list. ALWAYS DISPLAYED.")
-parser.add_argument("-OL", "--owner-exact-lower", type=str, help="(Strict) All instances where 'owner' tag matches OWNER exactly, entered as a comma separated list.")
-parser.add_argument("-OU", "--owner-exact-upper", type=str, help="(Strict) All instances where 'OWNER' tag matches OWNER exactly, entered as a comma separated list.")
-parser.add_argument("-OS", "--owner-exact-sentence", type=str, help="(Strict) All instances where 'Owner' tag matches OWNER exactly, entered as a comma separated list.")
+parser.add_argument("-OL", "--owner-exact-lower", action='append', help="(Strict) All instances where 'owner' tag matches OWNER exactly, accepts multiple values.")
+parser.add_argument("-OU", "--owner-exact-upper", action='append', help="(Strict) All instances where 'OWNER' tag matches OWNER exactly, accepts multiple values.")
+parser.add_argument("-OS", "--owner-exact-sentence", action='append', help="(Strict) All instances where 'Owner' tag matches OWNER exactly, accepts multiple values.")
 #TODO : parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, accpets multiple values. ALWAYS DISPLAYED.")
 parser.add_argument("-PL", "--project-exact-lower", type=str, help="(Strict) All instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
 parser.add_argument("-PU", "--project-exact-upper", type=str, help="(Strict) All instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
@@ -82,9 +82,11 @@ def get_filters():
     #                   Case-insensitive filter should be applied
     #                   programmatically after all results are returned
     ###################################################################
+    # Tag : name|NAME|Name
+    ###################################################################
     # Filter for Tag : name
     if args.name_exact_lower:
-        filter_name_e_l = {   # Search lowercase tag 'name'
+        filter_name_e_l = {
         'Name': 'tag:name',
         'Values': args.name_exact_lower
         }
@@ -92,7 +94,7 @@ def get_filters():
 
     # Filter for Tag : NAME
     if args.name_exact_upper:
-        filter_name_e_u = {   # Search lowercase tag 'NAME'
+        filter_name_e_u = {
         'Name': 'tag:NAME',
         'Values': args.name_exact_upper
         }
@@ -100,11 +102,38 @@ def get_filters():
 
     # Filter for Tag : Name
     if args.name_exact_sentence:
-        filter_name_e_s = {   # Search lowercase tag 'Name'
+        filter_name_e_s = {
         'Name': 'tag:Name',
         'Values': args.name_exact_sentence
         }
         filters["name_exact_sent"] = filter_name_e_s
+
+    ###################################################################
+    # Tag : owner|OWNER|Owner
+    ###################################################################
+    # Filter for Tag : owner 
+    if args.owner_exact_lower:
+        filter_owner_e_l = {
+        'Name': 'tag:owner',
+        'Values': args.owner_exact_lower
+        }
+        filters["owner_exact_low"] = filter_owner_e_l
+
+    # Filter for Tag : OWNER
+    if args.owner_exact_upper:
+        filter_owner_e_u = {
+        'Name': 'tag:OWNER',
+        'Values': args.owner_exact_upper
+        }
+        filters["owner_exact_upp"] = filter_owner_e_u
+
+    # Filter for Tag : Owner
+    if args.owner_exact_sentence:
+        filter_owner_e_s = {
+        'Name': 'tag:Owner',
+        'Values': args.owner_exact_sentence
+        }
+        filters["owner_exact_sent"] = filter_owner_e_s
 
     ###################################################################
     
