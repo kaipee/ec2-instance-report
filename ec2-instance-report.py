@@ -5,7 +5,7 @@ import argparse
 
 # Make the sript user-friendly by providing some arguments and help options
 parser = argparse.ArgumentParser(description="Retrieve a list of AWS EC2 instances.")
-parser.add_argument("-c", "--lifecycle", choices=['all', 'spot', 'scheduled'], type=str, help="All instances matching LIFECYCLE.")
+parser.add_argument("-c", "--lifecycle", action='append', choices=['all', 'spot', 'scheduled'], type=str, help="All instances matching LIFECYCLE.")
 parser.add_argument("-e", "--elastic-ip", type=str, help="All instances matching the ELASTIC_IP.")
 parser.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
 parser.add_argument("-i", "--id", type=str, help="All instances matching ID, entered as a comma separated list. ALWAYS DISPLAYED.")
@@ -34,9 +34,16 @@ session = boto3.Session(profile_name='ec2report')   # Create a boto3 session usi
 def get_filters():
     filters = {}
     
+    # Filter for lifecycle if provided
+    if args.lifecycle:
+        filter_lifecycle = {
+        'Name': 'instance-lifecycle',
+        'Values': args.lifecycle
+        }
+        filters["lifecycle"] = filter_lifecycle
+    
     # Filter for custom tags if provided
     if args.custom_tag:
-       # arg_custom_tag = {'Name': 'tag-key', 'Values': args.custom_tag}   # Dirty hack to filter custom Tag keys
         filter_custag = {
         'Name': 'tag-key',
         'Values': args.custom_tag
