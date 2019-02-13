@@ -42,13 +42,21 @@ def get_filters():
         }
         filters["lifecycle"] = filter_lifecycle
     
-    # Filter for lifecycle if provided
+    # Filter for Elastic IP if provided
     if args.elastic_ip:
         filter_elasticip = {
         'Name': 'network-interface.association.public-ip',
         'Values': [args.elastic_ip]
         }
         filters["elasticip"] = filter_elasticip
+    
+    # Filter for Private IP if provided
+    if args.private_ip:
+        filter_privateip = {
+        'Name': 'network-interface.addresses.private-ip-address',
+        'Values': [args.private_ip]
+        }
+        filters["privateip"] = filter_privateip
     
     # Filter for custom tags if provided
     if args.custom_tag:
