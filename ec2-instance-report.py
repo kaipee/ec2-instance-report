@@ -3,6 +3,15 @@ import boto3
 import os
 import argparse
 
+# Report should be run using restricted IAM Role.
+# IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
+os.environ['AWS_PROFILE'] = 'ec2report'   # Define which profile to connect with
+session = boto3.Session(profile_name='ec2report')   # Create a boto3 session using the defined profile
+
+######################
+# Set up the arguments
+######################
+
 # Make the sript user-friendly by providing some arguments and help options
 # Search filters
 parser = argparse.ArgumentParser(description="Retrieve a list of AWS EC2 instances.")
@@ -27,18 +36,19 @@ parser.add_argument("-r", "--region", action='append', type=str, help="All insta
 parser.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
 state_args = ['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated']
 parser.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, accepts multiple values. ALWAYS DISPLAYED.")
-parser.add_argument("--test", help="Debug, print all args", action="store_true")
 # Display options (value printed if argument passed)
 parser.add_argument("-l", "--launchtime", help="Display the instance launch time.", action="store_true")
 parser.add_argument("-t", "--transition", help="Display last state transition details if availale.", action="store_true")
+# Debug filters
+parser.add_argument("--debug-args", help="Debug, print all args", action="store_true")
+parser.add_argument("--debug-filters", help="Debug, print all filters", action="store_true")
 
 global args
 args = parser.parse_args()
 
-# Report should be run using restricted IAM Role.
-# IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
-os.environ['AWS_PROFILE'] = 'ec2report'   # Define which profile to connect with
-session = boto3.Session(profile_name='ec2report')   # Create a boto3 session using the defined profile
+##############################
+# Define the various functions
+##############################
 
 def get_filters():
     filters = {}
@@ -183,10 +193,14 @@ def get_filters():
     }
     filters["state"] = filter_state
 
-    # Return filters
-    for value in filters.values():
-#        print(value) ##DEBUG
-        return value
+    if args.debug_filters:
+        # Return filters
+        for value in filters.values():
+            print(value) ##DEBUG
+    else:
+        # Return filters
+        for value in filters.values():
+            return value
 
 def get_region():
     global region_list
@@ -197,6 +211,7 @@ def get_region():
 def get_instances():
     # Declare dict to be used for storing instance details later
     ec2data = defaultdict()
+    ctags = {}
     
     print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
     for region in arg_region:
@@ -281,8 +296,12 @@ def get_instances():
             #    print(data[3])
             print(region + "\t" + name + "\t" + inst_id + "\t" + inst_type + "\t" + lifecycle + "\t" + launch_time + "\t" + state + "\t" + transition + "\t" + private_ip + "\t" + public_ip + "\t" + owner + "\t" + project)
 
+##############
+# Do the stuff
+##############
+
 ## CONFIRM THE CURRENT VALUES OF EACH ARGUMENT FOR TESTING
-if args.test:
+if args.debug_args:
     print(args)
     print("\n")
 
@@ -303,11 +322,13 @@ if args.region_print:
     print('------------------')
     print('Retrieved from AWS')
     print('------------------')
+elif args.debug_filters:
+    # Print the list of filters and values
+    print(get_filters())
 else:
     # Go ahead and output the instance details if not checking for a list of regions
-    ctags = {}
     get_instances()
-#    print(get_filters()) ##DEBUG
+
 
 '''
 # Print results as a table
