@@ -11,9 +11,9 @@ parser.add_argument("-e", "--elastic-ip", type=str, help="All instances matching
 parser.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
 parser.add_argument("-i", "--id", action='append', help="All instances matching ID, accepts multiple values. ALWAYS DISPLAYED.")
 #TODO : parser.add_argument("-nu", "--nameupper", type=str, help="(Loose) All instances where 'Name' tag contains NAME, accepts multiple values.")
-parser.add_argument("-NL", "--name-exact-lower", type=str, help="(Strict) All instances where 'name' tag matches NAME exactly, accepts multiple values.")
-parser.add_argument("-NU", "--name-exact-upper", type=str, help="(Strict) All instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
-parser.add_argument("-NS", "--name-exact-sentence", type=str, help="(Strict) All instances where 'Name' tag matches NAME exactly, accepts multiple values.")
+parser.add_argument("-NL", "--name-exact-lower", action='append', help="(Strict) All instances where 'name' tag matches NAME exactly, accepts multiple values.")
+parser.add_argument("-NU", "--name-exact-upper", action='append', help="(Strict) All instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
+parser.add_argument("-NS", "--name-exact-sentence", action='append', help="(Strict) All instances where 'Name' tag matches NAME exactly, accepts multiple values.")
 parser.add_argument("-x", "--custom-tag", action='append', help="(Loose) All instances where tag is like CUSTOM_TAG, accepts multiple values.")
 #TODO : parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where 'Owner' tag contains OWNER, entered as a comma separated list. ALWAYS DISPLAYED.")
 parser.add_argument("-OL", "--owner-exact-lower", type=str, help="(Strict) All instances where 'owner' tag matches OWNER exactly, entered as a comma separated list.")
@@ -86,9 +86,25 @@ def get_filters():
     if args.name_exact_lower:
         filter_name_e_l = {   # Search lowercase tag 'name'
         'Name': 'tag:name',
-        'Values': [args.name_exact_lower]
+        'Values': args.name_exact_lower
         }
-        filters["name"] = filter_name_e_l
+        filters["name_exact_low"] = filter_name_e_l
+
+    # Filter for Tag : NAME
+    if args.name_exact_upper:
+        filter_name_e_u = {   # Search lowercase tag 'NAME'
+        'Name': 'tag:NAME',
+        'Values': args.name_exact_upper
+        }
+        filters["name_exact_upp"] = filter_name_e_u
+
+    # Filter for Tag : Name
+    if args.name_exact_sentence:
+        filter_name_e_s = {   # Search lowercase tag 'Name'
+        'Name': 'tag:Name',
+        'Values': args.name_exact_sentence
+        }
+        filters["name_exact_sent"] = filter_name_e_s
 
     ###################################################################
     
