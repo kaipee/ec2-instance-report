@@ -83,20 +83,13 @@ def get_filters():
     #                   programmatically after all results are returned
     ###################################################################
     # Filter for Tag : name
-    if args.name:
-        filter_name = {   # Search lowercase tag 'name'
-        'Name': str.lower('tag:name'),
-        'Values': [args.name]
+    if args.name_exact_lower:
+        filter_name_e_l = {   # Search lowercase tag 'name'
+        'Name': 'tag:name',
+        'Values': [args.name_exact_lower]
         }
-        filters["name"] = filter_name
+        filters["name"] = filter_name_e_l
 
-    # Filter for Tag : Name
-    if args.name:
-        filter_name = {   # Search lowercase tag 'name'
-        'Name': str.lower('tag:name'),
-        'Values': [args.name]
-        }
-        filters["name"] = filter_name
     ###################################################################
     
     # Filter for custom tags if provided
