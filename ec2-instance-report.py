@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser(description="Retrieve a list of AWS EC2 instanc
 parser.add_argument("-c", "--lifecycle", action="store_true", help="All instances matching LIFECYCLE.")
 parser.add_argument("-e", "--elastic-ip", type=str, help="All instances matching the ELASTIC_IP.")
 parser.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
-parser.add_argument("-i", "--id", type=str, help="All instances matching ID, entered as a comma separated list. ALWAYS DISPLAYED.")
+parser.add_argument("-i", "--id", action='append', help="All instances matching ID, accepts multiple values. ALWAYS DISPLAYED.")
 #TODO : parser.add_argument("-nu", "--nameupper", type=str, help="(Loose) All instances where 'Name' tag contains NAME, accepts multiple values.")
 parser.add_argument("-NL", "--name-exact-lower", type=str, help="(Strict) All instances where 'name' tag matches NAME exactly, accepts multiple values.")
 parser.add_argument("-NU", "--name-exact-upper", type=str, help="(Strict) All instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
@@ -71,7 +71,7 @@ def get_filters():
     if args.id:
         filter_instanceid = {
         'Name': 'instance-id',
-        'Values': [args.id]
+        'Values': args.id
         }
         filters["instance_id"] = filter_instanceid
 
