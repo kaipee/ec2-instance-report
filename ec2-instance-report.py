@@ -194,9 +194,22 @@ def get_filters():
     filters["state"] = filter_state
 
     if args.debug_filters:
-        # Return filters
-        for value in filters.values():
-            print(value) ##DEBUG
+        print("-----------")
+        print("FILTER LIST")
+        print("-----------")
+        print(filters)    # Print the full currently assigned filters dict
+
+        print("\n-------------")
+        print("FILTER KEYS")
+        print("-------------")
+        for value in filters.keys():    # Print each currently defined filter key
+            print(value)
+
+        print("\n-------------")
+        print("FILTER VALUES")
+        print("-------------")
+        for value in filters.values():    # Print each currently defined filter value
+            print(value)
     else:
         # Return filters
         for value in filters.values():
@@ -324,7 +337,7 @@ if args.region_print:
     print('------------------')
 elif args.debug_filters:
     # Print the list of filters and values
-    print(get_filters())
+    get_filters()
 else:
     # Go ahead and output the instance details if not checking for a list of regions
     get_instances()
