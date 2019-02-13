@@ -58,6 +58,14 @@ def get_filters():
         }
         filters["privateip"] = filter_privateip
     
+    # Filter for Instance ID if provided
+    if args.id:
+        filter_instanceid = {
+        'Name': 'instance-id',
+        'Values': [args.id]
+        }
+        filters["instance_id"] = filter_instanceid
+    
     # Filter for custom tags if provided
     if args.custom_tag:
         filter_custag = {
