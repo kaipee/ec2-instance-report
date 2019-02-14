@@ -1,4 +1,4 @@
-from collections import defaultdict
+from pprint import pprint as pp
 import boto3
 import os
 import argparse
@@ -62,8 +62,9 @@ g_display.add_argument("-t", "--transition", help="Display last state transition
 # Debug filters
 g_debug.add_argument("--debug-args", help="Debug, print all args", action="store_true")
 g_debug.add_argument("--debug-filters", help="Debug, print all filters", action="store_true")
+g_debug.add_argument("--debug-ec2data", help="Debug, print the ec2data dictionary", action="store_true")
 g_debug.add_argument("-R", "--region-print", action='store_true', help="Print all publicly available region names.")
-g_debug.add_argument("-Z", "--zone-print", action='store_true', help="Print all availablity zones.")
+g_debug.add_argument("-Z", "--zone-print", action='store_true', help="Print all availablity zones and status.")
 
 global args
 args = parser.parse_args()
@@ -231,7 +232,7 @@ def get_filters():
         print("FILTER VALUES")
         print("-------------")
         for value in filters.values():    # Print each currently defined filter value
-            print(value)
+            pp(value)
     else:
         # Return filters
         for value in filters.values():
@@ -260,11 +261,12 @@ def get_zone():
        print('--------------------')
     
 def get_instances():
-    # Declare dict to be used for storing instance details later
-    ec2data = defaultdict()
-    ctags = {}
+    ec2data = dict()   # Declare dict to be used for storing instance details later
+    ctags = {}    # Declare dict to store all custom tag key:value pairs
     
-    print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
+    if not args.debug_ec2data:
+        print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
+
     for region in arg_region:
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
         instances = ec2.instances.filter(   # Filter the list of returned instance - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.ServiceResource.instances 
@@ -345,15 +347,20 @@ def get_instances():
             # Print results line by line
             #for data in ec2data:
             #    print(data[3])
-            print(region + "\t" + name + "\t" + inst_id + "\t" + inst_type + "\t" + lifecycle + "\t" + launch_time + "\t" + state + "\t" + transition + "\t" + private_ip + "\t" + public_ip + "\t" + owner + "\t" + project)
+            if not args.debug_ec2data:
+                print(region + "\t" + name + "\t" + inst_id + "\t" + inst_type + "\t" + lifecycle + "\t" + launch_time + "\t" + state + "\t" + transition + "\t" + private_ip + "\t" + public_ip + "\t" + owner + "\t" + project)
+
+    if args.debug_ec2data:
+        pp(ec2data)
 
 ##############
 # Do the stuff
 ##############
+instance_print = True
 
 ## CONFIRM THE CURRENT VALUES OF EACH ARGUMENT FOR TESTING
 if args.debug_args:
-    print(args)
+    pp(args)
     print("\n")
 
 # Check if --region set and assign variable values
@@ -373,12 +380,25 @@ if args.region_print:
     print('------------------')
     print('Retrieved from AWS')
     print('------------------')
-elif args.debug_filters:
+    instance_print = False
+
+if args.debug_filters:
     # Print the list of filters and values
+    if args.region:
+        print('-----------------')
+        print('FILTERED REGIONS')
+        print('-----------------')
+        for region in arg_region:
+            print(region)
+        print("\n")
     get_filters()
-elif args.zone_print:
+    instance_print = False
+
+if args.zone_print:
     get_zone()
-else:
+    instance_print = False
+
+if instance_print:
     # Go ahead and output the instance details if not checking for a list of regions
     get_instances()
 
