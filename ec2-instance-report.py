@@ -3,6 +3,17 @@ import boto3
 import os
 import argparse
 
+# Define output color classes
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
 # AWS example code ref : https://github.com/awsdocs/aws-doc-sdk-examples/tree/master/python/example_code
 
 # Report should be run using restricted IAM Role.
@@ -242,7 +253,10 @@ def get_zone():
        # Obtain all accessible availablility zones for this session
        zone_list = client.describe_availability_zones()['AvailabilityZones']
        for zone in zone_list:
-           print(zone['ZoneName'] + " : " + zone['State'])
+           if zone['State'] == 'available':
+               print(zone['ZoneName'] + " : " + bcolors.OKGREEN + zone['State'] + bcolors.ENDC)
+           else:
+               print(zone['ZoneName'] + " : " + bcolors.FAIL + zone['State'] + bcolors.ENDC)
        print('--------------------')
     
 def get_instances():
