@@ -74,6 +74,7 @@ args = parser.parse_args()
 ##############################
 
 def get_filters():
+    global filters
     filters = {}
     
     # Filter for lifecycle if provided
@@ -216,24 +217,7 @@ def get_filters():
         }
         filters["cust_tag"] = filter_custag
     
-    if args.debug_filters:
-        print("-----------")
-        print("FILTER LIST")
-        print("-----------")
-        print(filters)    # Print the full currently assigned filters dict
-
-        print("\n-------------")
-        print("FILTER KEYS")
-        print("-------------")
-        for value in filters.keys():    # Print each currently defined filter key
-            print(value)
-
-        print("\n-------------")
-        print("FILTER VALUES")
-        print("-------------")
-        for value in filters.values():    # Print each currently defined filter value
-            pp(value)
-    else:
+    if not args.debug_filters:
         # Return filters
         for value in filters.values():
             return value
@@ -261,6 +245,7 @@ def get_zone():
        print('--------------------')
     
 def get_instances():
+    global ec2data
     ec2data = dict()   # Declare dict to be used for storing instance details later
     ctags = {}    # Declare dict to store all custom tag key:value pairs
     
@@ -350,9 +335,6 @@ def get_instances():
             if not args.debug_ec2data:
                 print(region + "\t" + name + "\t" + inst_id + "\t" + inst_type + "\t" + lifecycle + "\t" + launch_time + "\t" + state + "\t" + transition + "\t" + private_ip + "\t" + public_ip + "\t" + owner + "\t" + project)
 
-    if args.debug_ec2data:
-        pp(ec2data)
-
 ##############
 # Do the stuff
 ##############
@@ -383,6 +365,7 @@ if args.region_print:
     instance_print = False
 
 if args.debug_filters:
+    get_filters()
     # Print the list of filters and values
     if args.region:
         print('-----------------')
@@ -391,8 +374,43 @@ if args.debug_filters:
         for region in arg_region:
             print(region)
         print("\n")
-    get_filters()
     instance_print = False
+    print("-----------")
+    print("FILTER LIST")
+    print("-----------")
+    print(filters)    # Print the full currently assigned filters dict
+
+    print("\n-------------")
+    print("FILTER KEYS")
+    print("-------------")
+    for value in filters.keys():    # Print each currently defined filter key
+        print(value)
+
+    print("\n-------------")
+    print("FILTER VALUES")
+    print("-------------")
+    for value in filters.values():    # Print each currently defined filter value
+        pp(value)
+
+if args.debug_ec2data:
+    get_instances()
+    print("------------------")
+    print("EC2DATA DICTIONARY")
+    print("------------------")
+    pp(ec2data)
+    print("------------------\n")
+    for inst_k, inst_v in ec2data.items():
+        print("-------------------")
+        print(inst_k)
+        print("-------------------")
+        for t in inst_v.keys():
+            title = t
+            print(title)
+        for a in inst_v:
+            attribute = inst_v[a]
+            print(attribute)
+        for k in inst_v.keys():
+            print(title + ": " + attribute)
 
 if args.zone_print:
     get_zone()
@@ -401,7 +419,6 @@ if args.zone_print:
 if instance_print:
     # Go ahead and output the instance details if not checking for a list of regions
     get_instances()
-
 
 '''
 # Print results as a table
