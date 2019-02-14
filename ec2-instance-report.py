@@ -3,6 +3,8 @@ import boto3
 import os
 import argparse
 
+# AWS example code ref : https://github.com/awsdocs/aws-doc-sdk-examples/tree/master/python/example_code
+
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
 os.environ['AWS_PROFILE'] = 'ec2report'   # Define which profile to connect with
@@ -49,7 +51,8 @@ g_display.add_argument("-t", "--transition", help="Display last state transition
 # Debug filters
 g_debug.add_argument("--debug-args", help="Debug, print all args", action="store_true")
 g_debug.add_argument("--debug-filters", help="Debug, print all filters", action="store_true")
-g_debug.add_argument("-R", "--region-print", action='store_true', help="Print all available region names.")
+g_debug.add_argument("-R", "--region-print", action='store_true', help="Print all publicly available region names.")
+g_debug.add_argument("-Z", "--zone-print", action='store_true', help="Print all availablity zones.")
 
 global args
 args = parser.parse_args()
@@ -182,14 +185,6 @@ def get_filters():
 
     ###################################################################
     
-    # Filter for custom tags if provided
-    if args.custom_tag:
-        filter_custag = {
-        'Name': 'tag-key',
-        'Values': args.custom_tag
-        }
-        filters["cust_tag"] = filter_custag
-    
     # Filter for instance state (default to all)
     if args.state:
         arg_state = args.state    # Set the instance state depending on -s --state argument
@@ -201,6 +196,14 @@ def get_filters():
     }
     filters["state"] = filter_state
 
+    # Filter for custom tags if provided
+    if args.custom_tag:
+        filter_custag = {
+        'Name': 'tag-key',
+        'Values': args.custom_tag
+        }
+        filters["cust_tag"] = filter_custag
+    
     if args.debug_filters:
         print("-----------")
         print("FILTER LIST")
@@ -225,9 +228,22 @@ def get_filters():
 
 def get_region():
     global region_list
-    # Obtain all publicly available regions
+    # Obtain all publicly accessible regions for this session
     region_list = session.get_available_regions('ec2')
     return region_list
+    
+def get_zone():
+    global zone_list
+    print('--------------------')
+    for region in arg_region:
+       print('REGION : ' + region)
+       print('--------------------')
+       client = boto3.client('ec2', region)
+       # Obtain all accessible availablility zones for this session
+       zone_list = client.describe_availability_zones()['AvailabilityZones']
+       for zone in zone_list:
+           print(zone['ZoneName'] + " : " + zone['State'])
+       print('--------------------')
     
 def get_instances():
     # Declare dict to be used for storing instance details later
@@ -237,7 +253,7 @@ def get_instances():
     print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
     for region in arg_region:
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
-        instances = ec2.instances.filter(   # Filter the list of returned instance - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.PlacementGroup.filters
+        instances = ec2.instances.filter(   # Filter the list of returned instance - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.ServiceResource.instances 
             # List of available filters : https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
             Filters=[
                 get_filters()
@@ -346,6 +362,8 @@ if args.region_print:
 elif args.debug_filters:
     # Print the list of filters and values
     get_filters()
+elif args.zone_print:
+    get_zone()
 else:
     # Go ahead and output the instance details if not checking for a list of regions
     get_instances()
