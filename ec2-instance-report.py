@@ -325,8 +325,8 @@ def get_instances():
     
             # Print results line by line
             if not args.debug_dict:
-                for k, v in ec2data[instance.id].items():
-                    print(k, v, sep=" : ")
+                data = ec2data[instance.id]
+                print("\t".join(ec2data[instance.id].values()))
                 print('---------')
 
 ##############
