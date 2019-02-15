@@ -30,11 +30,11 @@ sudo chmod 600 ~/.aws/credentials
 ```
 
 
-# TODO
+## Arguments
 
 Take arguments in the following format (all arguments are cumulative)
 
-## Search Filters
+### Search Filters
 | Short | Long | Description | Defaults | Display |
 | :--- | :--- | :--- | :--- | :--- |
 | **-e** | **--public {filter}** | Filter results matching exactly the elastic IP (Public IP) | List all instances with or without EIP |
@@ -50,11 +50,23 @@ Take arguments in the following format (all arguments are cumulative)
 | **-s** | **--state {filter}** | Take one or more __expected values__<br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Display all instances regardless of state |
 | **-t** | **--type {filter}** | Take one or more instance types as search filter | List all types |
 
-## Display Options
+### Display Options
 | Short | Long | Description | Defaults | Display |
 | :--- | :--- | :--- | :--- | :--- |
 | **-l** | **--lifecycle** | Display instance lifecycle type (spot or scheduled) | Do not display |
 | **-t** | **--transition** | Display last transition state details if present | Do not display |
+
+# TODO
+
+Implement custom filter/display for the following:
+* Name
+* Name-exact
+* Owner
+* Owner-exact
+* Project
+* Project-exact
+* Custom
+* Custom-exact
 
 ~~Use a restricted IAM role - do not use individual credentials!!~~
 

@@ -73,7 +73,7 @@ args = parser.parse_args()
 # Define the various functions
 ##############################
 
-def get_filters():
+def get_filters(): # Filter instance results by AWS API_Filter attributes that are not Tags and do not require fuzzy searching (tag filtering should be case-insensitive)
     global filters
     filters = {}
     
@@ -119,12 +119,12 @@ def get_filters():
     # Tag : name|NAME|Name
     ###################################################################
     # Filter for Tag : name
-    if args.name_exact_lower:
-        filter_name_e_l = {
-        'Name': 'tag:name',
-        'Values': args.name_exact_lower
-        }
-        filters["name_exact_low"] = filter_name_e_l
+#    if args.name_exact_lower:
+#        filter_name_e_l = {
+#        'Name': 'tag:name',
+#        'Values': args.name_exact_lower
+#        }
+#        filters["name_exact_low"] = filter_name_e_l
 
     # Filter for Tag : NAME
     if args.name_exact_upper:
@@ -247,7 +247,7 @@ def get_zone():
 def get_instances():
     global ec2data
     ec2data = dict()   # Declare dict to be used for storing instance details later
-    ctags = {}    # Declare dict to store all custom tag key:value pairs
+    ctags = dict()    # Declare dict to store all custom tag key:value pairs
     
     if not args.debug_ec2data:
         print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
@@ -262,72 +262,67 @@ def get_instances():
         )
         for instance in instances:
             # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
+            inst_id = instance.id
             tags = instance.tags
             name = "NO_NAME"
             owner = "NO_OWNER"
             project = "NO_PROJECT"
+            ec2data[inst_id] = {}
             if tags :
                 for tag in tags:
                     key = tag['Key']
                     if str.lower(key) == 'name':    # Check for any tags with a value of Name or name
                         name = tag['Value']   # Set name variable to be equal to the value of the Name/name tag
+                        ec2data[inst_id].update({'Name': name})
                     if str.lower(key) == 'owner':
                         owner = tag['Value']
+                        ec2data[inst_id].update({'Owner' : owner})
                     if str.lower(key) == 'project':
                         project = tag['Value']
+                        ec2data[inst_id].update({'Project' : project})
     
                     if args.custom_tag:   # Loop over the list of custom tags if present
                         for custom_tag in args.custom_tag:
                             if tag['Key'] == custom_tag:
-                                print(custom_tag + " : " + tag['Value'])
+                                #print(custom_tag + " : " + tag['Value'])
                                 ctags[tag['Key']] = tag['Value']
+                                ec2data[inst_id].update(ctags)
 
-            inst_id = instance.id
-    
+            # Add instance info to a dictionary         
             if instance.state['Name']:
-                state = instance.state['Name']
+                ec2data[inst_id].update({'State': instance.state['Name']})
             else:
-                state = 'NO_STATE'
+                ec2data[inst_id].update({'State': "STATE_UND"})
     
             if instance.instance_lifecycle:
-                lifecycle = instance.instance_lifecycle
+                ec2data[inst_id].update({'Lifecycle': instance.instance_lifecycle})
             elif instance.instance_lifecycle is None:
-                lifecycle = 'Scheduled'   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
+                ec2data[inst_id].update({'Lifecycle': 'Scheduled'})   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
     
             if instance.private_ip_address:
-                private_ip = instance.private_ip_address
+                ec2data[inst_id].update({'Private IP': instance.private_ip_address})
             else:
-                private_ip = 'NO_PRV_IP'
+                ec2data[inst_id].update({'Private IP': 'NO_PRV_IP'})
     
             if instance.public_ip_address:
-                public_ip = instance.public_ip_address
+                ec2data[inst_id].update({'Public IP': instance.public_ip_address})
             else:
-                public_ip = 'NO_PUB_IP'
-    
-            inst_type = instance.instance_type
+                ec2data[inst_id].update({'Public IP': 'NO_PUB_IP'})
     
             if instance.launch_time:
-                launch_time = instance.launch_time.strftime("%m/%d/%Y %H:%M:%S")
+                ec2data[inst_id].update({'Launch Time': instance.launch_time.strftime("%m/%d/%Y %H:%M:%S")})
             else:
-                launch_time = 'NO_LAUNCH'
+                ec2data[inst_id].update({'Launch Time': 'NO_LAUNCH'})
     
             if instance.state_transition_reason:
-                transition = instance.state_transition_reason
+                ec2data[inst_id].update({'Transition Reason' : instance.state_transition_reason})
             else:
-                transition = 'NO_TRANS'
+                ec2data[inst_id].update({'Transition Reason' : 'NO_TRANS'})
     
-            # Add instance info to a dictionary         
-            ec2data[instance.id] = { 
-                'Name': name,
-                'Type': inst_type,
-                'Lifecycle': lifecycle,
-                'Owner' : owner,
-                'State': state,
-                'Private IP': private_ip,
-                'Public IP': public_ip,
-                'Launch Time': launch_time,
-                'Transition Reason' : transition
-                }
+            if instance.instance_type:
+                ec2data[inst_id].update({'Transition Reason' : instance.instance_type})
+            else:
+                ec2data[inst_id].update({'Transition Reason' : 'NO_TRANS'})
     
             # Print results line by line
             #for data in ec2data:
@@ -398,7 +393,6 @@ if args.debug_ec2data:
     print("EC2DATA DICTIONARY")
     print("------------------")
     pp(ec2data)
-    print("------------------\n")
     for inst_id, inst_v in ec2data.items():
         print("-------------------")
         print(inst_id)
