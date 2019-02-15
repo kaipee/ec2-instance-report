@@ -399,18 +399,12 @@ if args.debug_ec2data:
     print("------------------")
     pp(ec2data)
     print("------------------\n")
-    for inst_k, inst_v in ec2data.items():
+    for inst_id, inst_v in ec2data.items():
         print("-------------------")
-        print(inst_k)
+        print(inst_id)
         print("-------------------")
-        for t in inst_v.keys():
-            title = t
-            print(title)
-        for a in inst_v:
-            attribute = inst_v[a]
-            print(attribute)
-        for k in inst_v.keys():
-            print(title + ": " + attribute)
+        for title, attribute in inst_v.items():
+            print(title + " : " + attribute)
 
 if args.zone_print:
     get_zone()
