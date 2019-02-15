@@ -62,7 +62,7 @@ g_display.add_argument("-t", "--transition", help="Display last state transition
 # Debug filters
 g_debug.add_argument("--debug-args", help="Debug, print all args", action="store_true")
 g_debug.add_argument("--debug-filters", help="Debug, print all filters", action="store_true")
-g_debug.add_argument("--debug-ec2data", help="Debug, print the ec2data dictionary", action="store_true")
+g_debug.add_argument("--debug-dict", help="Debug, print the ec2data dictionary", action="store_true")
 g_debug.add_argument("-R", "--region-print", action='store_true', help="Print all publicly available region names.")
 g_debug.add_argument("-Z", "--zone-print", action='store_true', help="Print all availablity zones and status.")
 
@@ -249,8 +249,8 @@ def get_instances():
     ec2data = dict()   # Declare dict to be used for storing instance details later
     ctags = dict()    # Declare dict to store all custom tag key:value pairs
     
-    if not args.debug_ec2data:
-        print("REGION\tNAME\tINSTANCE ID\tISNTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
+    if not args.debug_dict:
+        print("REGION\tNAME\tINSTANCE ID\tINSTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
 
     for region in arg_region:
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
@@ -262,73 +262,72 @@ def get_instances():
         )
         for instance in instances:
             # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
-            inst_id = instance.id
+            # Retrieve all instance attributes and assign desired attributes to dict that can be iterated over later
+            ec2data[instance.id] = {
+                'Instance ID': instance.id,
+                'Launch Time': bcolors.WARNING + 'NO_LAUNCH' + bcolors.ENDC,
+                'Lifecycle': 'Scheduled',   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
+                'Name': bcolors.WARNING + "NO_NAME" + bcolors.ENDC,
+                'Owner': bcolors.WARNING + "NO_OWNER" + bcolors.ENDC,
+                'Private IP': bcolors.WARNING + 'NO_PRV_IP' + bcolors.ENDC,
+                'Project': bcolors.WARNING + "NO_PROJECT" + bcolors.ENDC,
+                'Public IP': 'NO_PUB_IP',
+                'State': bcolors.WARNING + "STATE_UND" + bcolors.ENDC,
+                'Transition Reason': bcolors.WARNING + 'NO_TRANS' + bcolors.ENDC,
+                'Type': bcolors.WARNING + "UNKNOWN_TYPE" + bcolors.ENDC
+                }
             tags = instance.tags
-            name = "NO_NAME"
-            owner = "NO_OWNER"
-            project = "NO_PROJECT"
-            ec2data[inst_id] = {}
             if tags :
                 for tag in tags:
                     key = tag['Key']
                     if str.lower(key) == 'name':    # Check for any tags with a value of Name or name
                         name = tag['Value']   # Set name variable to be equal to the value of the Name/name tag
-                        ec2data[inst_id].update({'Name': name})
+                        ec2data[instance.id].update({'Name': name})
                     if str.lower(key) == 'owner':
                         owner = tag['Value']
-                        ec2data[inst_id].update({'Owner' : owner})
+                        ec2data[instance.id].update({'Owner' : owner})
                     if str.lower(key) == 'project':
                         project = tag['Value']
-                        ec2data[inst_id].update({'Project' : project})
+                        ec2data[instance.id].update({'Project' : project})
     
                     if args.custom_tag:   # Loop over the list of custom tags if present
                         for custom_tag in args.custom_tag:
                             if tag['Key'] == custom_tag:
-                                #print(custom_tag + " : " + tag['Value'])
                                 ctags[tag['Key']] = tag['Value']
-                                ec2data[inst_id].update(ctags)
+                                ec2data[instance.id].update(ctags)
 
-            # Add instance info to a dictionary         
-            if instance.state['Name']:
-                ec2data[inst_id].update({'State': instance.state['Name']})
-            else:
-                ec2data[inst_id].update({'State': "STATE_UND"})
+            # Update instance info in dict
+            if instance.launch_time:
+                ec2data[instance.id].update({'Launch Time': instance.launch_time.strftime("%m/%d/%Y %H:%M:%S")})
     
             if instance.instance_lifecycle:
-                ec2data[inst_id].update({'Lifecycle': instance.instance_lifecycle})
-            elif instance.instance_lifecycle is None:
-                ec2data[inst_id].update({'Lifecycle': 'Scheduled'})   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
-    
-            if instance.private_ip_address:
-                ec2data[inst_id].update({'Private IP': instance.private_ip_address})
-            else:
-                ec2data[inst_id].update({'Private IP': 'NO_PRV_IP'})
+                ec2data[instance.id].update({'Lifecycle': instance.instance_lifecycle})
     
             if instance.public_ip_address:
-                ec2data[inst_id].update({'Public IP': instance.public_ip_address})
-            else:
-                ec2data[inst_id].update({'Public IP': 'NO_PUB_IP'})
+                ec2data[instance.id].update({'Public IP': instance.public_ip_address})
     
-            if instance.launch_time:
-                ec2data[inst_id].update({'Launch Time': instance.launch_time.strftime("%m/%d/%Y %H:%M:%S")})
-            else:
-                ec2data[inst_id].update({'Launch Time': 'NO_LAUNCH'})
+            if instance.private_ip_address:
+                ec2data[instance.id].update({'Private IP': instance.private_ip_address})
+    
+            if instance.state['Name']:
+                if instance.state['Name'] == 'terminated':
+                    ec2data[instance.id].update({'State': bcolors.FAIL + instance.state['Name'] + bcolors.ENDC})    # Highlight terminated instances
+                elif instance.state['Name'] == 'stopped':
+                    ec2data[instance.id].update({'State': bcolors.WARNING + instance.state['Name'] + bcolors.ENDC})   # Highlight stopped instances
+                else:
+                    ec2data[instance.id].update({'State': instance.state['Name']})
     
             if instance.state_transition_reason:
-                ec2data[inst_id].update({'Transition Reason' : instance.state_transition_reason})
-            else:
-                ec2data[inst_id].update({'Transition Reason' : 'NO_TRANS'})
+                ec2data[instance.id].update({'Transition Reason' : instance.state_transition_reason})
     
             if instance.instance_type:
-                ec2data[inst_id].update({'Transition Reason' : instance.instance_type})
-            else:
-                ec2data[inst_id].update({'Transition Reason' : 'NO_TRANS'})
+                ec2data[instance.id].update({'Type' : instance.instance_type})
     
             # Print results line by line
-            #for data in ec2data:
-            #    print(data[3])
-            if not args.debug_ec2data:
-                print(region + "\t" + name + "\t" + inst_id + "\t" + inst_type + "\t" + lifecycle + "\t" + launch_time + "\t" + state + "\t" + transition + "\t" + private_ip + "\t" + public_ip + "\t" + owner + "\t" + project)
+            if not args.debug_dict:
+                for k, v in ec2data[instance.id].items():
+                    print(k, v, sep=" : ")
+                print('---------')
 
 ##############
 # Do the stuff
@@ -387,18 +386,18 @@ if args.debug_filters:
     for value in filters.values():    # Print each currently defined filter value
         pp(value)
 
-if args.debug_ec2data:
+if args.debug_dict:
     get_instances()
     print("------------------")
     print("EC2DATA DICTIONARY")
     print("------------------")
     pp(ec2data)
-    for inst_id, inst_v in ec2data.items():
+    for i_id, i_v in ec2data.items():
         print("-------------------")
-        print(inst_id)
+        print(i_id)
         print("-------------------")
-        for title, attribute in inst_v.items():
-            print(title + " : " + attribute)
+        for title, attribute in i_v.items():
+            print(title, attribute, sep=" : ")
 
 if args.zone_print:
     get_zone()
