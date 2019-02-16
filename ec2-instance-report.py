@@ -272,6 +272,7 @@ def get_instances():
                 'Private IP': bcolors.WARNING + 'NO_PRV_IP' + bcolors.ENDC,
                 'Project': bcolors.WARNING + "NO_PROJECT" + bcolors.ENDC,
                 'Public IP': 'NO_PUB_IP',
+                'Region': region,
                 'State': bcolors.WARNING + "STATE_UND" + bcolors.ENDC,
                 'Transition Reason': bcolors.WARNING + 'NO_TRANS' + bcolors.ENDC,
                 'Type': bcolors.WARNING + "UNKNOWN_TYPE" + bcolors.ENDC
@@ -327,7 +328,6 @@ def get_instances():
             if not args.debug_dict:
                 data = ec2data[instance.id]
                 print("\t".join(ec2data[instance.id].values()))
-                print('---------')
 
 ##############
 # Do the stuff
