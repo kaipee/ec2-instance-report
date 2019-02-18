@@ -327,7 +327,6 @@ def get_instances():
             if not args.debug_dict:
                 data = ec2data[instance.id]
                 print("\t".join(ec2data[instance.id].values()))
-                print('---------')
 
 ##############
 # Do the stuff
