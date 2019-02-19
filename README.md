@@ -33,6 +33,8 @@ aws_secret_access_key=[AWS_SECRET]
 sudo chmod 400 ~/.aws/credentials
 ```
 
+
+
 ## Usage
 
 Simply executing the script will return a full, unfiltered, list of **all EC2 Instances** in **all regions**, grouped by region.
@@ -51,6 +53,8 @@ ap-southeast-2	instance5	NO_OWNER	NO_PROJECT	i-123987456dbef	t2.micro	Scheduled	
 ```
 
 Command-line arguments are available to filter the list of instances or hide/display columns.
+
+
 
 ## Command-line Arguments
 
@@ -89,6 +93,8 @@ Command-line arguments are available to filter the list of instances or hide/dis
 | | **--debug-dict** | Boolean | Pretty print the ec2data dictionary |
 | **-R** | **--region-print** | Boolean | Retrieve a list of all currently available AWS Regions |
 | **-Z** | **--zone-print** | Boolean | Retrieve a list of all currently available AWS Availability Zones, grouped by Region, and display status |
+
+
 
 ## TODO
 
