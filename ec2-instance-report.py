@@ -250,7 +250,7 @@ def get_instances():
     ctags = dict()    # Declare dict to store all custom tag key:value pairs
     
     if not args.debug_dict:
-        print("REGION\tNAME\tINSTANCE ID\tINSTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP\tOWNER\tPROJECT")
+        print("REGION\tNAME\tOWNER\tPROJECT\tINSTANCE ID\tINSTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP")
 
     for region in arg_region:
         ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
@@ -264,18 +264,18 @@ def get_instances():
             # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
             # Retrieve all instance attributes and assign desired attributes to dict that can be iterated over later
             ec2data[instance.id] = {
-                'Instance ID': instance.id,
-                'Launch Time': bcolors.WARNING + 'NO_LAUNCH' + bcolors.ENDC,
-                'Lifecycle': 'Scheduled',   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
+                'Region': region,
                 'Name': bcolors.WARNING + "NO_NAME" + bcolors.ENDC,
                 'Owner': bcolors.WARNING + "NO_OWNER" + bcolors.ENDC,
-                'Private IP': bcolors.WARNING + 'NO_PRV_IP' + bcolors.ENDC,
                 'Project': bcolors.WARNING + "NO_PROJECT" + bcolors.ENDC,
-                'Public IP': 'NO_PUB_IP',
-                'Region': region,
+                'Instance ID': instance.id,
+                'Type': bcolors.WARNING + "UNKNOWN_TYPE" + bcolors.ENDC,
+                'Lifecycle': 'Scheduled',   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
+                'Launch Time': bcolors.WARNING + 'NO_LAUNCH' + bcolors.ENDC,
                 'State': bcolors.WARNING + "STATE_UND" + bcolors.ENDC,
                 'Transition Reason': bcolors.WARNING + 'NO_TRANS' + bcolors.ENDC,
-                'Type': bcolors.WARNING + "UNKNOWN_TYPE" + bcolors.ENDC
+                'Private IP': bcolors.WARNING + 'NO_PRV_IP' + bcolors.ENDC,
+                'Public IP': 'NO_PUB_IP'
                 }
             tags = instance.tags
             if tags :
