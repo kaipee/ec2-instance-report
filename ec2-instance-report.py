@@ -56,6 +56,7 @@ g_filters.add_argument("-s", "--state", action='append', choices=state_args, hel
 g_filters.add_argument("-x", "--custom-tag", action='append', help="(Loose) All instances where tag is like CUSTOM_TAG, accepts multiple values.")
 
 # Display options (value printed if argument passed)
+g_display.add_argument("--colour", help="Colorize the output.", action="store_true")
 g_display.add_argument("-l", "--launchtime", help="Display the instance launch time.", action="store_true")
 g_display.add_argument("-t", "--transition", help="Display last state transition details if availale.", action="store_true")
 
@@ -119,12 +120,12 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
     # Tag : name|NAME|Name
     ###################################################################
     # Filter for Tag : name
-#    if args.name_exact_lower:
-#        filter_name_e_l = {
-#        'Name': 'tag:name',
-#        'Values': args.name_exact_lower
-#        }
-#        filters["name_exact_low"] = filter_name_e_l
+    if args.name_exact_lower:
+        filter_name_e_l = {
+        'Name': 'tag:name',
+        'Values': args.name_exact_lower
+        }
+        filters["name_exact_low"] = filter_name_e_l
 
     # Filter for Tag : NAME
     if args.name_exact_upper:
@@ -239,9 +240,15 @@ def get_zone():
        zone_list = client.describe_availability_zones()['AvailabilityZones']
        for zone in zone_list:
            if zone['State'] == 'available':
-               print(zone['ZoneName'] + " : " + bcolors.OKGREEN + zone['State'] + bcolors.ENDC)
+               if ags.colour:
+                   print(zone['ZoneName'] + " : " + bcolors.OKGREEN + zone['State'] + bcolors.ENDC)
+               else:
+                   print(zone['ZoneName'] + " : " + zone['State'])
            else:
-               print(zone['ZoneName'] + " : " + bcolors.FAIL + zone['State'] + bcolors.ENDC)
+               if args.color:
+                   print(zone['ZoneName'] + " : " + bcolors.FAIL + zone['State'] + bcolors.ENDC)
+               else:
+                   print(zone['ZoneName'] + " : " + zone['State'])
        print('--------------------')
     
 def get_instances():
@@ -263,20 +270,36 @@ def get_instances():
         for instance in instances:
             # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
             # Retrieve all instance attributes and assign desired attributes to dict that can be iterated over later
-            ec2data[instance.id] = {
-                'Region': region,
-                'Name': bcolors.WARNING + "NO_NAME" + bcolors.ENDC,
-                'Owner': bcolors.WARNING + "NO_OWNER" + bcolors.ENDC,
-                'Project': bcolors.WARNING + "NO_PROJECT" + bcolors.ENDC,
-                'Instance ID': instance.id,
-                'Type': bcolors.WARNING + "UNKNOWN_TYPE" + bcolors.ENDC,
-                'Lifecycle': 'Scheduled',   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
-                'Launch Time': bcolors.WARNING + 'NO_LAUNCH' + bcolors.ENDC,
-                'State': bcolors.WARNING + "STATE_UND" + bcolors.ENDC,
-                'Transition Reason': bcolors.WARNING + 'NO_TRANS' + bcolors.ENDC,
-                'Private IP': bcolors.WARNING + 'NO_PRV_IP' + bcolors.ENDC,
-                'Public IP': 'NO_PUB_IP'
-                }
+            if args.colour:
+                ec2data[instance.id] = {
+                    'Region': region,
+                    'Name': bcolors.WARNING + "NO_NAME" + bcolors.ENDC,
+                    'Owner': bcolors.WARNING + "NO_OWNER" + bcolors.ENDC,
+                    'Project': bcolors.WARNING + "NO_PROJECT" + bcolors.ENDC,
+                    'Instance ID': instance.id,
+                    'Type': bcolors.WARNING + "UNKNOWN_TYPE" + bcolors.ENDC,
+                    'Lifecycle': 'Scheduled',   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
+                    'Launch Time': bcolors.WARNING + 'NO_LAUNCH' + bcolors.ENDC,
+                    'State': bcolors.WARNING + "STATE_UND" + bcolors.ENDC,
+                    'Transition Reason': bcolors.WARNING + 'NO_TRANS' + bcolors.ENDC,
+                    'Private IP': bcolors.WARNING + 'NO_PRV_IP' + bcolors.ENDC,
+                    'Public IP': 'NO_PUB_IP'
+                    }
+            else:
+                ec2data[instance.id] = {
+                    'Region': region,
+                    'Name': "NO_NAME",
+                    'Owner': "NO_OWNER",
+                    'Project': "NO_PROJECT",
+                    'Instance ID': instance.id,
+                    'Type': "UNKNOWN_TYPE",
+                    'Lifecycle': 'Scheduled',   # Boto 3 returns only 'spot'. Set to 'Scheduled' if not a spot instance
+                    'Launch Time': 'NO_LAUNCH',
+                    'State': "STATE_UND",
+                    'Transition Reason': 'NO_TRANS',
+                    'Private IP': 'NO_PRV_IP',
+                    'Public IP': 'NO_PUB_IP'
+                    }
             tags = instance.tags
             if tags :
                 for tag in tags:
@@ -312,9 +335,15 @@ def get_instances():
     
             if instance.state['Name']:
                 if instance.state['Name'] == 'terminated':
-                    ec2data[instance.id].update({'State': bcolors.FAIL + instance.state['Name'] + bcolors.ENDC})    # Highlight terminated instances
+                    if args.colour:
+                        ec2data[instance.id].update({'State': bcolors.FAIL + instance.state['Name'] + bcolors.ENDC})    # Highlight terminated instances
+                    else:
+                        ec2data[instance.id].update({'State': instance.state['Name']})    # Highlight terminated instances
                 elif instance.state['Name'] == 'stopped':
-                    ec2data[instance.id].update({'State': bcolors.WARNING + instance.state['Name'] + bcolors.ENDC})   # Highlight stopped instances
+                    if args.colour:
+                        ec2data[instance.id].update({'State': bcolors.WARNING + instance.state['Name'] + bcolors.ENDC})   # Highlight stopped instances
+                    else:
+                        ec2data[instance.id].update({'State': instance.state['Name']})   # Highlight stopped instances
                 else:
                     ec2data[instance.id].update({'State': instance.state['Name']})
     
@@ -406,22 +435,3 @@ if args.zone_print:
 if instance_print:
     # Go ahead and output the instance details if not checking for a list of regions
     get_instances()
-
-'''
-# Print results as a table
-template = "{Name:10}|{Type:10}|{Lifecycle:10}"
-print(template.format(Name="Name", Type="Type", Lifecycle="Lifecycle"))
-attributes = ['Name', 'Type', 'Lifecycle', 'Owner', 'State', 'Private IP', 'Public IP', 'Launch Time']
-for instance_id, instance in ec2data.items():
-    for key in attributes:
-        print(template.format(*key))
-'''
-
-'''
-# Print results in blocks
-attributes = ['Name', 'Type', 'Lifecycle', 'Owner', 'State', 'Private IP', 'Public IP', 'Launch Time']
-for instance_id, instance in ec2data.items():
-    for key in attributes:
-        print("{0:10}|{1:10}".format(key, instance[key]))
-    print("------")
-'''
