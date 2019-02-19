@@ -18,8 +18,8 @@ class bcolors:
 
 # Report should be run using restricted IAM Role.
 # IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
-os.environ['AWS_PROFILE'] = 'ec2report'   # Define which profile to connect with
-session = boto3.Session(profile_name='ec2report')   # Create a boto3 session using the defined profile
+os.environ['AWS_PROFILE'] = 'script_ec2instancereport'   # Define which profile to connect with
+session = boto3.Session(profile_name='script_ec2instancereport')   # Create a boto3 session using the defined profile
 
 ######################
 # Set up the arguments
@@ -34,26 +34,26 @@ g_display = parser.add_argument_group('DISPLAY OPTIONS')
 g_debug = parser.add_argument_group('DEBUG')
 
 # Search filters
-g_filters.add_argument("-c", "--lifecycle", action="store_true", help="All instances matching LIFECYCLE.")
-g_filters.add_argument("-e", "--elastic-ip", type=str, help="All instances matching the ELASTIC_IP.")
-g_filters.add_argument("-f", "--private-ip", type=str, help="All instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
-g_filters.add_argument("-i", "--id", action='append', help="All instances matching ID, accepts multiple values. ALWAYS DISPLAYED.")
+g_filters.add_argument("-c", "--lifecycle", action="store_true", help="Only spot instances.")
+g_filters.add_argument("-e", "--elastic-ip", type=str, help="Only instances matching the ELASTIC_IP.")
+g_filters.add_argument("-f", "--private-ip", type=str, help="Only instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
+g_filters.add_argument("-i", "--id", action='append', help="Only instances matching ID, accepts multiple values. ALWAYS DISPLAYED.")
 #TODO : parser.add_argument("-nu", "--nameupper", type=str, help="(Loose) All instances where 'Name' tag contains NAME, accepts multiple values.")
-g_filters.add_argument("-NL", "--name-exact-lower", action='append', help="(Strict) All instances where 'name' tag matches NAME exactly, accepts multiple values.")
-g_filters.add_argument("-NU", "--name-exact-upper", action='append', help="(Strict) All instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
-g_filters.add_argument("-NS", "--name-exact-sentence", action='append', help="(Strict) All instances where 'Name' tag matches NAME exactly, accepts multiple values.")
+g_filters.add_argument("-NL", "--name-exact-lower", action='append', help="(Strict) Only instances where 'name' tag matches NAME exactly, accepts multiple values.")
+g_filters.add_argument("-NU", "--name-exact-upper", action='append', help="(Strict) Only instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
+g_filters.add_argument("-NS", "--name-exact-sentence", action='append', help="(Strict) Only instances where 'Name' tag matches NAME exactly, accepts multiple values.")
 #TODO : parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where 'Owner' tag contains OWNER, entered as a comma separated list. ALWAYS DISPLAYED.")
-g_filters.add_argument("-OL", "--owner-exact-lower", action='append', help="(Strict) All instances where 'owner' tag matches OWNER exactly, accepts multiple values.")
-g_filters.add_argument("-OU", "--owner-exact-upper", action='append', help="(Strict) All instances where 'OWNER' tag matches OWNER exactly, accepts multiple values.")
-g_filters.add_argument("-OS", "--owner-exact-sentence", action='append', help="(Strict) All instances where 'Owner' tag matches OWNER exactly, accepts multiple values.")
+g_filters.add_argument("-OL", "--owner-exact-lower", action='append', help="(Strict) Only instances where 'owner' tag matches OWNER exactly, accepts multiple values.")
+g_filters.add_argument("-OU", "--owner-exact-upper", action='append', help="(Strict) Only instances where 'OWNER' tag matches OWNER exactly, accepts multiple values.")
+g_filters.add_argument("-OS", "--owner-exact-sentence", action='append', help="(Strict) Only instances where 'Owner' tag matches OWNER exactly, accepts multiple values.")
 #TODO : parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, accpets multiple values. ALWAYS DISPLAYED.")
-g_filters.add_argument("-PL", "--project-exact-lower", action='append', help="(Strict) All instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
-g_filters.add_argument("-PU", "--project-exact-upper", action='append', help="(Strict) All instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
-g_filters.add_argument("-PS", "--project-exact-sentence", action='append', help="(Strict) All instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
-g_filters.add_argument("-r", "--region", action='append', type=str, help="All instances in Region(s) REGION, accepts multiple values. ALWAYS DISPLAYED.")
+g_filters.add_argument("-PL", "--project-exact-lower", action='append', help="(Strict) Only instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
+g_filters.add_argument("-PU", "--project-exact-upper", action='append', help="(Strict) Only instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
+g_filters.add_argument("-PS", "--project-exact-sentence", action='append', help="(Strict) Only instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
+g_filters.add_argument("-r", "--region", action='append', type=str, help="Only instances in Region(s) REGION, accepts multiple values. ALWAYS DISPLAYED.")
 state_args = ['pending', 'running', 'shutting-down', 'stopping', 'stopped', 'terminated']
-g_filters.add_argument("-s", "--state", action='append', choices=state_args, help="All instances with Instance State STATE, accepts multiple values. ALWAYS DISPLAYED.")
-g_filters.add_argument("-x", "--custom-tag", action='append', help="(Loose) All instances where tag is like CUSTOM_TAG, accepts multiple values.")
+g_filters.add_argument("-s", "--state", action='append', choices=state_args, help="Only instances with Instance State STATE, accepts multiple values. ALWAYS DISPLAYED.")
+g_filters.add_argument("-x", "--custom-tag", action='append', help="(Loose) Only instances where tag is like CUSTOM_TAG, accepts multiple values.")
 
 # Display options (value printed if argument passed)
 g_display.add_argument("--colour", help="Colorize the output.", action="store_true")
@@ -240,7 +240,7 @@ def get_zone():
        zone_list = client.describe_availability_zones()['AvailabilityZones']
        for zone in zone_list:
            if zone['State'] == 'available':
-               if ags.colour:
+               if args.colour:
                    print(zone['ZoneName'] + " : " + bcolors.OKGREEN + zone['State'] + bcolors.ENDC)
                else:
                    print(zone['ZoneName'] + " : " + zone['State'])
@@ -260,7 +260,7 @@ def get_instances():
         print("REGION\tNAME\tOWNER\tPROJECT\tINSTANCE ID\tINSTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP")
 
     for region in arg_region:
-        ec2 = boto3.resource('ec2', region)   # Print a delimiter to identify the current region
+        ec2 = boto3.resource('ec2', str.lower(region))   # Print a delimiter to identify the current region
         instances = ec2.instances.filter(   # Filter the list of returned instance - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.ServiceResource.instances 
             # List of available filters : https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
             Filters=[
@@ -272,7 +272,7 @@ def get_instances():
             # Retrieve all instance attributes and assign desired attributes to dict that can be iterated over later
             if args.colour:
                 ec2data[instance.id] = {
-                    'Region': region,
+                    'Region': str.lower(region),
                     'Name': bcolors.WARNING + "NO_NAME" + bcolors.ENDC,
                     'Owner': bcolors.WARNING + "NO_OWNER" + bcolors.ENDC,
                     'Project': bcolors.WARNING + "NO_PROJECT" + bcolors.ENDC,
@@ -287,7 +287,7 @@ def get_instances():
                     }
             else:
                 ec2data[instance.id] = {
-                    'Region': region,
+                    'Region': str.lower(region),
                     'Name': "NO_NAME",
                     'Owner': "NO_OWNER",
                     'Project': "NO_PROJECT",
@@ -395,7 +395,7 @@ if args.debug_filters:
         print('FILTERED REGIONS')
         print('-----------------')
         for region in arg_region:
-            print(region)
+            print(str.lower(region))
         print("\n")
     instance_print = False
     print("-----------")
