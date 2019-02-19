@@ -61,38 +61,38 @@ Command-line arguments are available to filter the list of instances or hide/dis
 ### Search Filters
 | Short | Long | Type | Description | Filter Case Sensitivity | Multiple Allowed |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **-c** | **--lifecycle** | Boolean | Return only spot instances | N/A | N/A |
-| **-e** | **--elastic-ip {filter}** | String | Return only instances associated with the elastic IP *{filter}* | N/A | No |
-| **-f** | **--private-ip {filter}** | String | Return only instances associated with the Private IP *{filter}* | N/A | No |
-| **-i** | **--id {filter}** | String | Return only instances that have Instance ID *{filter}* | Sensitive | Yes |
-| **-NL** | **--name-exact-lower {filter}** | String | Return only instances that have Tag:**name** *{filter}* | Sensitive | Yes |
-| **-NU** | **--name-exact-upper {filter}** | String | Return only instances that have Tag:**NAME** *{filter}* | Sensitive | Yes |
-| **-NS** | **--name-exact-sentence {filter}** | String | Return only instances that have Tag:**Name** *{filter}* | Sensitive | Yes |
-| **-OL** | **--owner-exact-lower {filter}** | String | Return only instances that have Tag:**owner** *{filter}* | Sensitive | Yes |
-| **-OU** | **--owner-exact-upper {filter}** | String | Return only instances that have Tag:**OWNER** *{filter}* | Sensitive | Yes |
-| **-OS** | **--owner-exact-sentence {filter}** | String | Return only instances that have Tag:**Owner** *{filter}* | Sensitive | Yes |
-| **-PL** | **--project-exact-lower {filter}** | String | Return only instances that have Tag:**project** *{filter}* | Sensitive | Yes |
-| **-PU** | **--project-exact-upper {filter}** | String | Return only instances that have Tag:**PROJECT** *{filter}* | Sensitive | Yes |
-| **-PS** | **--project-exact-sentence {filter}** | String | Return only instances that have Tag:**Project** *{filter}* | Sensitive | Yes |
-| **-r** | **--region {filter}** | String | Return only instances in the region *{filter}* | Insensitive | Yes |
-| **-s** | **--state {filter}** | Expected String | Return only instances with state : <br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Sensitive | Yes |
-| **-x** | **--custom-tag {filter}** | String | Return only instances with Tag:*{filter}* | Sensitive | Yes |
+| -c | --lifecycle | Boolean | Return only spot instances | N/A | N/A |
+| -e | --elastic-ip {filter} | String | Return only instances associated with the elastic IP *{filter}* | N/A | No |
+| -f | --private-ip {filter} | String | Return only instances associated with the Private IP *{filter}* | N/A | No |
+| -i | --id {filter} | String | Return only instances that have Instance ID *{filter}* | Sensitive | Yes |
+| -NL | --name-exact-lower {filter} | String | Return only instances that have Tag:**name** *{filter}* | Sensitive | Yes |
+| -NU | --name-exact-upper {filter} | String | Return only instances that have Tag:**NAME** *{filter}* | Sensitive | Yes |
+| -NS | --name-exact-sentence {filter} | String | Return only instances that have Tag:**Name** *{filter}* | Sensitive | Yes |
+| -OL | --owner-exact-lower {filter} | String | Return only instances that have Tag:**owner** *{filter}* | Sensitive | Yes |
+| -OU | --owner-exact-upper {filter} | String | Return only instances that have Tag:**OWNER** *{filter}* | Sensitive | Yes |
+| -OS | --owner-exact-sentence {filter} | String | Return only instances that have Tag:**Owner** *{filter}* | Sensitive | Yes |
+| -PL | --project-exact-lower {filter} | String | Return only instances that have Tag:**project** *{filter}* | Sensitive | Yes |
+| -PU | --project-exact-upper {filter} | String | Return only instances that have Tag:**PROJECT** *{filter}* | Sensitive | Yes |
+| -PS | --project-exact-sentence {filter} | String | Return only instances that have Tag:**Project** *{filter}* | Sensitive | Yes |
+| -r | --region {filter} | String | Return only instances in the region *{filter}* | Insensitive | Yes |
+| -s | --state {filter} | Expected String | Return only instances with state : <br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Sensitive | Yes |
+| -x | --custom-tag {filter} | String | Return only instances with Tag:*{filter}* | Sensitive | Yes |
 
 ### Display Options
 | Short | Long | Type | Description |
 | :--- | :--- | :--- | :--- |
 | | **--colour** | Boolean | Display coloured output (highlights missing tags and instance states) |
-| **-l** | **--launchtime** | Boolean | Display instance Launch Time |
-| **-t** | **--transition** | Boolean | Display last transition state details (if present, otherwise show NO_TRANS) |
+| -l | --launchtime | Boolean | Display instance Launch Time |
+| -t | --transition | Boolean | Display last transition state details (if present, otherwise show NO_TRANS) |
 
 ### Debug Options
 | Short | Long | Type | Description |
 | :--- | :--- | :--- | :--- |
-| | **--debug-args** | Boolean | Print all currently passed arguments |
-| | **--debug-filters** | Boolean | Print all currently passed search filters |
-| | **--debug-dict** | Boolean | Pretty print the ec2data dictionary |
-| **-R** | **--region-print** | Boolean | Retrieve a list of all currently available AWS Regions |
-| **-Z** | **--zone-print** | Boolean | Retrieve a list of all currently available AWS Availability Zones, grouped by Region, and display status |
+| | --debug-args | Boolean | Print all currently passed arguments |
+| | --debug-filters | Boolean | Print all currently passed search filters |
+| | --debug-dict | Boolean | Pretty print the ec2data dictionary |
+| -R | --region-print | Boolean | Retrieve a list of all currently available AWS Regions |
+| -Z | --zone-print | Boolean | Retrieve a list of all currently available AWS Availability Zones, grouped by Region, and display status |
 
 
 
