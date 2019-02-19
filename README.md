@@ -41,6 +41,8 @@ Simply executing the script will return a full, unfiltered, list of **all EC2 In
 python ec2-instance-report.py
 ```
 
+### Example output without arguments
+
 ```bash
 REGION	NAME	OWNER	PROJECT	INSTANCE ID	INSTANCE TYPE	LIFECYCLE	LAUNCH TIME	STATE	LAST TRANSITION	PRIVATE IP	PUBLIC IP
 us-east-1	instance1	auser	team-1	i-123456789abcdef	c4.xlarge	Scheduled	10/27/2017 14:59:48	stopped	User initiated (2017-10-31 09:30:13 GMT)	172.0.0.1	NO_PUB_IP
