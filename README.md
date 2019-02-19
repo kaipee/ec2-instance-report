@@ -52,9 +52,9 @@ ap-southeast-2	instance5	NO_OWNER	NO_PROJECT	i-123987456dbef	t2.micro	Scheduled	
 
 Command-line arguments are available to filter the list of instances or hide/display columns.
 
-### Command-line Arguments
+## Command-line Arguments
 
-#### Search Filters
+### Search Filters
 | Short | Long | Type | Description | Filter Case Sensitivity | Multiple Allowed |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **-c** | **--lifecycle** | Boolean | Return only spot instances | N/A | N/A |
@@ -74,14 +74,14 @@ Command-line arguments are available to filter the list of instances or hide/dis
 | **-s** | **--state {filter}** | Expected String | Return only instances with state : <br><br>* pending<br>* running<br>* shutting-down<br>* terminated<br>* stopping<br>* stopped | Sensitive | Yes |
 | **-x** | **--custom-tag {filter}** | String | Return only instances with Tag:*{filter}* | Sensitive | Yes |
 
-#### Display Options
+### Display Options
 | Short | Long | Type | Description |
 | :--- | :--- | :--- | :--- |
 | | **--colour** | Boolean | Display coloured output (highlights missing tags and instance states) |
 | **-l** | **--launchtime** | Boolean | Display instance Launch Time |
 | **-t** | **--transition** | Boolean | Display last transition state details (if present, otherwise show NO_TRANS) |
 
-#### Debug Options
+### Debug Options
 | Short | Long | Type | Description |
 | :--- | :--- | :--- | :--- |
 | | **--debug-args** | Boolean | Print all currently passed arguments |
