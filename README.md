@@ -128,3 +128,7 @@ Group by Region then sort by transition date old>new
 
 ### Export data
 Export to CSV report : reports/{MONTH_YEAR}/{datestamp}_{REGIONS}.csv
+
+# License
+
+Licensed under GNU General Public License v3.0
