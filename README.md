@@ -95,6 +95,26 @@ Command-line arguments are available to filter the list of instances or hide/dis
 | -Z | --zone-print | Boolean | Retrieve a list of all currently available AWS Availability Zones, grouped by Region, and display status |
 
 
+## Examples
+
+Find ALL RUNNING instances in US-EAST-1 with no name AND no owner AND no project. Exported to tab-delimited CSV file.
+
+```
+python ec2-instance-report.py -r us-east-1 -s running | grep -E 'NO_NAME.*NO_OWNER.*NO_PROJECT' > ~/tmp/ec2_running-missing-all_$(date +%F_%T).csv
+```
+
+Find ALL RUNNING instances in US-EAST-1 with EITHER no name OR no owner OR no project. Exported to tab-delimited CSV file.
+
+```
+python ec2-instance-report.py -r us-east-1 -s running | grep 'NO_OWNER\|NO_PROJECT\|NO_NAME' > ~/tmp/ec2_running-missing-1_$(date +%F_%T).csv
+```
+
+Find ALL stopped instances in US-EAST-1. Exported to tab-delimited CSV file.
+
+```
+python ec2-instance-report.py -r us-east-1 -s stopped -s stopping -s shutting-down > ~/tmp/ec2_stopped_$(date +%F_%T).csv
+```
+
 
 ## TODO
 
