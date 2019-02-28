@@ -80,35 +80,31 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
     
     # Filter for lifecycle if provided
     if args.lifecycle:
-        filter_lifecycle = {
-        'Name': 'instance-lifecycle',
-        'Values': ['spot']
+        filters["lifecycle"] = {
+            'Name': 'instance-lifecycle',
+            'Values': ['spot']
         }
-        filters["lifecycle"] = filter_lifecycle
     
     # Filter for Elastic IP if provided
     if args.elastic_ip:
-        filter_elasticip = {
-        'Name': 'network-interface.association.public-ip',
-        'Values': [args.elastic_ip]
+        filters["elasticip"] = {
+            'Name': 'network-interface.association.public-ip',
+            'Values': [args.elastic_ip]
         }
-        filters["elasticip"] = filter_elasticip
     
     # Filter for Private IP if provided
     if args.private_ip:
-        filter_privateip = {
-        'Name': 'network-interface.addresses.private-ip-address',
-        'Values': [args.private_ip]
+        filters["privateip"] = {
+            'Name': 'network-interface.addresses.private-ip-address',
+            'Values': [args.private_ip]
         }
-        filters["privateip"] = filter_privateip
     
     # Filter for Instance ID if provided
     if args.id:
-        filter_instanceid = {
-        'Name': 'instance-id',
-        'Values': args.id
+        filters["instance_id"] = {
+            'Name': 'instance-id',
+            'Values': args.id
         }
-        filters["instance_id"] = filter_instanceid
 
     ###################################################################    
     # Quick and dirty - AWS API_FILTER is explicitly case-sensitive
@@ -121,81 +117,72 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
     ###################################################################
     # Filter for Tag : name
     if args.name_exact_lower:
-        filter_name_e_l = {
-        'Name': 'tag:name',
-        'Values': args.name_exact_lower
+        filters["name_exact_low"] = {
+            'Name': 'tag:name',
+            'Values': args.name_exact_lower
         }
-        filters["name_exact_low"] = filter_name_e_l
 
     # Filter for Tag : NAME
     if args.name_exact_upper:
-        filter_name_e_u = {
-        'Name': 'tag:NAME',
-        'Values': args.name_exact_upper
+        filters["name_exact_upp"]= {
+            'Name': 'tag:NAME',
+            'Values': args.name_exact_upper
         }
-        filters["name_exact_upp"] = filter_name_e_u
 
     # Filter for Tag : Name
     if args.name_exact_sentence:
-        filter_name_e_s = {
-        'Name': 'tag:Name',
-        'Values': args.name_exact_sentence
+        filters["name_exact_sent"] = {
+            'Name': 'tag:Name',
+            'Values': args.name_exact_sentence
         }
-        filters["name_exact_sent"] = filter_name_e_s
 
     ###################################################################
     # Tag : owner|OWNER|Owner
     ###################################################################
     # Filter for Tag : owner 
     if args.owner_exact_lower:
-        filter_owner_e_l = {
-        'Name': 'tag:owner',
-        'Values': args.owner_exact_lower
+        filters["owner_exact_low"] = {
+            'Name': 'tag:owner',
+            'Values': args.owner_exact_lower
         }
-        filters["owner_exact_low"] = filter_owner_e_l
 
     # Filter for Tag : OWNER
     if args.owner_exact_upper:
-        filter_owner_e_u = {
-        'Name': 'tag:OWNER',
-        'Values': args.owner_exact_upper
+        filters["owner_exact_upp"]= {
+            'Name': 'tag:OWNER',
+            'Values': args.owner_exact_upper
         }
-        filters["owner_exact_upp"] = filter_owner_e_u
 
     # Filter for Tag : Owner
     if args.owner_exact_sentence:
-        filter_owner_e_s = {
-        'Name': 'tag:Owner',
-        'Values': args.owner_exact_sentence
+        filters["owner_exact_sent"] = {
+            'Name': 'tag:Owner',
+            'Values': args.owner_exact_sentence
         }
-        filters["owner_exact_sent"] = filter_owner_e_s
 
     ###################################################################
     # Tag : project|PROJECT|Project
     ###################################################################
     # Filter for Tag : project 
     if args.project_exact_lower:
-        filter_project_e_l = {
-        'Name': 'tag:project',
-        'Values': args.project_exact_lower
+        filters["project_exact_low"] = {
+            'Name': 'tag:project',
+            'Values': args.project_exact_lower
         }
-        filters["project_exact_low"] = filter_project_e_l
 
     # Filter for Tag : PROJECT
     if args.project_exact_upper:
-        filter_project_e_u = {
-        'Name': 'tag:PROJECT',
-        'Values': args.project_exact_upper
+        filters["project_exact_upp"] = {
+            'Name': 'tag:PROJECT',
+            'Values': args.project_exact_upper
         }
-        filters["project_exact_upp"] = filter_project_e_u
 
     # Filter for Tag : Project
     if args.project_exact_sentence:
-        filter_project_e_s = {
-        'Name': 'tag:Project',
-        'Values': args.project_exact_sentence
+        filters["project_exact_sent"] = {
+            'Name': 'tag:Project',
+            'Values': args.project_exact_sentence
         }
-        filters["project_exact_sent"] = filter_project_e_s
 
     ###################################################################
     
@@ -204,24 +191,24 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
         arg_state = args.state    # Set the instance state depending on -s --state argument
     else:
         arg_state = state_args    # Set the instance state to a default list of all states
-    filter_state = {
-    'Name': 'instance-state-name',
-    'Values': arg_state
+    filters["state"]= {
+        'Name': 'instance-state-name',
+        'Values': arg_state
     }
-    filters["state"] = filter_state
 
     # Filter for custom tags if provided
     if args.custom_tag:
-        filter_custag = {
-        'Name': 'tag-key',
-        'Values': args.custom_tag
+        filters["cust_tag"] = {
+            'Name': 'tag-key',
+            'Values': args.custom_tag
         }
-        filters["cust_tag"] = filter_custag
     
     if not args.debug_filters:
         # Return filters
+        Filters = []
         for value in filters.values():
-            return value
+            Filters.append(value)
+        return Filters
 
 def get_region():
     global region_list
@@ -263,9 +250,7 @@ def get_instances():
         ec2 = boto3.resource('ec2', str.lower(region))   # Print a delimiter to identify the current region
         instances = ec2.instances.filter(   # Filter the list of returned instance - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.ServiceResource.instances 
             # List of available filters : https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
-            Filters=[
-                get_filters()
-            ]
+            Filters=get_filters()
         )
         for instance in instances:
             # List of available attributes : https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#instance
