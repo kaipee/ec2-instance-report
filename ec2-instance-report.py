@@ -1,7 +1,9 @@
+# AWS example code ref : https://github.com/awsdocs/aws-doc-sdk-examples/tree/master/python/example_code
 from pprint import pprint as pp
 import boto3
 import os
 import argparse
+
 
 # Define output color classes
 class bcolors:
@@ -14,10 +16,11 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-# AWS example code ref : https://github.com/awsdocs/aws-doc-sdk-examples/tree/master/python/example_code
 
-# Report should be run using restricted IAM Role.
-# IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
+'''
+Report should be run using restricted IAM Role.
+IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
+'''
 os.environ['AWS_PROFILE'] = 'script_ec2instancereport'   # Define which profile to connect with
 session = boto3.Session(profile_name='script_ec2instancereport')   # Create a boto3 session using the defined profile
 
@@ -38,15 +41,15 @@ g_filters.add_argument("-c", "--lifecycle", action="store_true", help="Only spot
 g_filters.add_argument("-e", "--elastic-ip", type=str, help="Only instances matching the ELASTIC_IP.")
 g_filters.add_argument("-f", "--private-ip", type=str, help="Only instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
 g_filters.add_argument("-i", "--id", action='append', help="Only instances matching ID, accepts multiple values. ALWAYS DISPLAYED.")
-#TODO : parser.add_argument("-nu", "--nameupper", type=str, help="(Loose) All instances where 'Name' tag contains NAME, accepts multiple values.")
+# TODO : parser.add_argument("-nu", "--nameupper", type=str, help="(Loose) All instances where 'Name' tag contains NAME, accepts multiple values.")
 g_filters.add_argument("-NL", "--name-exact-lower", action='append', help="(Strict) Only instances where 'name' tag matches NAME exactly, accepts multiple values.")
 g_filters.add_argument("-NU", "--name-exact-upper", action='append', help="(Strict) Only instances where 'NAME' tag matches NAME exactly, accepts multiple values.")
 g_filters.add_argument("-NS", "--name-exact-sentence", action='append', help="(Strict) Only instances where 'Name' tag matches NAME exactly, accepts multiple values.")
-#TODO : parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where 'Owner' tag contains OWNER, entered as a comma separated list. ALWAYS DISPLAYED.")
+# TODO : parser.add_argument("-o", "--owner", type=str, help="(Loose) All instances where 'Owner' tag contains OWNER, entered as a comma separated list. ALWAYS DISPLAYED.")
 g_filters.add_argument("-OL", "--owner-exact-lower", action='append', help="(Strict) Only instances where 'owner' tag matches OWNER exactly, accepts multiple values.")
 g_filters.add_argument("-OU", "--owner-exact-upper", action='append', help="(Strict) Only instances where 'OWNER' tag matches OWNER exactly, accepts multiple values.")
 g_filters.add_argument("-OS", "--owner-exact-sentence", action='append', help="(Strict) Only instances where 'Owner' tag matches OWNER exactly, accepts multiple values.")
-#TODO : parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, accpets multiple values. ALWAYS DISPLAYED.")
+# TODO : parser.add_argument("-p", "--project", type=str, help="(Loose) All instances where 'Project' tag contains PROJECT, accpets multiple values. ALWAYS DISPLAYED.")
 g_filters.add_argument("-PL", "--project-exact-lower", action='append', help="(Strict) Only instances where 'project' tag matches PROJECT exactly, accepts multiple values.")
 g_filters.add_argument("-PU", "--project-exact-upper", action='append', help="(Strict) Only instances where 'PROJECT' tag matches PROJECT exactly, accepts multiple values.")
 g_filters.add_argument("-PS", "--project-exact-sentence", action='append', help="(Strict) Only instances where 'Project' tag matches PROJECT exactly, accepts multiple values.")
@@ -74,31 +77,32 @@ args = parser.parse_args()
 # Define the various functions
 ##############################
 
-def get_filters(): # Filter instance results by AWS API_Filter attributes that are not Tags and do not require fuzzy searching (tag filtering should be case-insensitive)
+
+def get_filters():  # Filter instance results by AWS API_Filter attributes that are not Tags and do not require fuzzy searching (tag filtering should be case-insensitive)
     global filters
     filters = {}
-    
+
     # Filter for lifecycle if provided
     if args.lifecycle:
         filters["lifecycle"] = {
             'Name': 'instance-lifecycle',
             'Values': ['spot']
         }
-    
+
     # Filter for Elastic IP if provided
     if args.elastic_ip:
         filters["elasticip"] = {
             'Name': 'network-interface.association.public-ip',
             'Values': [args.elastic_ip]
         }
-    
+
     # Filter for Private IP if provided
     if args.private_ip:
         filters["privateip"] = {
             'Name': 'network-interface.addresses.private-ip-address',
             'Values': [args.private_ip]
         }
-    
+
     # Filter for Instance ID if provided
     if args.id:
         filters["instance_id"] = {
@@ -106,7 +110,7 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
             'Values': args.id
         }
 
-    ###################################################################    
+    '''
     # Quick and dirty - AWS API_FILTER is explicitly case-sensitive
     #                   and do not accept logic (no OR, explicitly AND).
     #                   Tag keys may be upper, lower, or other case.
@@ -115,6 +119,7 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
     ###################################################################
     # Tag : name|NAME|Name
     ###################################################################
+    '''
     # Filter for Tag : name
     if args.name_exact_lower:
         filters["name_exact_low"] = {
@@ -124,7 +129,7 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
 
     # Filter for Tag : NAME
     if args.name_exact_upper:
-        filters["name_exact_upp"]= {
+        filters["name_exact_upp"] = {
             'Name': 'tag:NAME',
             'Values': args.name_exact_upper
         }
@@ -136,10 +141,12 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
             'Values': args.name_exact_sentence
         }
 
+    '''
     ###################################################################
     # Tag : owner|OWNER|Owner
     ###################################################################
-    # Filter for Tag : owner 
+    '''
+    # Filter for Tag : owner
     if args.owner_exact_lower:
         filters["owner_exact_low"] = {
             'Name': 'tag:owner',
@@ -148,7 +155,7 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
 
     # Filter for Tag : OWNER
     if args.owner_exact_upper:
-        filters["owner_exact_upp"]= {
+        filters["owner_exact_upp"] = {
             'Name': 'tag:OWNER',
             'Values': args.owner_exact_upper
         }
@@ -160,10 +167,12 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
             'Values': args.owner_exact_sentence
         }
 
+    '''
     ###################################################################
     # Tag : project|PROJECT|Project
     ###################################################################
-    # Filter for Tag : project 
+    '''
+    # Filter for Tag : project
     if args.project_exact_lower:
         filters["project_exact_low"] = {
             'Name': 'tag:project',
@@ -183,15 +192,16 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
             'Name': 'tag:Project',
             'Values': args.project_exact_sentence
         }
-
+    '''
     ###################################################################
-    
+    '''
+
     # Filter for instance state (default to all)
     if args.state:
         arg_state = args.state    # Set the instance state depending on -s --state argument
     else:
         arg_state = state_args    # Set the instance state to a default list of all states
-    filters["state"]= {
+    filters["state"] = {
         'Name': 'instance-state-name',
         'Values': arg_state
     }
@@ -202,7 +212,7 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
             'Name': 'tag-key',
             'Values': args.custom_tag
         }
-    
+
     if not args.debug_filters:
         # Return filters
         Filters = []
@@ -210,45 +220,48 @@ def get_filters(): # Filter instance results by AWS API_Filter attributes that a
             Filters.append(value)
         return Filters
 
+
 def get_region():
     global region_list
     # Obtain all publicly accessible regions for this session
     region_list = session.get_available_regions('ec2')
     return region_list
-    
+
+
 def get_zone():
     global zone_list
     print('--------------------')
     for region in arg_region:
-       print('REGION : ' + region)
-       print('--------------------')
-       client = boto3.client('ec2', region)
-       # Obtain all accessible availablility zones for this session
-       zone_list = client.describe_availability_zones()['AvailabilityZones']
-       for zone in zone_list:
-           if zone['State'] == 'available':
-               if args.colour:
-                   print(zone['ZoneName'] + " : " + bcolors.OKGREEN + zone['State'] + bcolors.ENDC)
-               else:
-                   print(zone['ZoneName'] + " : " + zone['State'])
-           else:
-               if args.color:
-                   print(zone['ZoneName'] + " : " + bcolors.FAIL + zone['State'] + bcolors.ENDC)
-               else:
-                   print(zone['ZoneName'] + " : " + zone['State'])
-       print('--------------------')
-    
+        print('REGION : ' + region)
+        print('--------------------')
+        client = boto3.client('ec2', region)
+        # Obtain all accessible availablility zones for this session
+        zone_list = client.describe_availability_zones()['AvailabilityZones']
+        for zone in zone_list:
+            if zone['State'] == 'available':
+                if args.colour:
+                    print(zone['ZoneName'] + " : " + bcolors.OKGREEN + zone['State'] + bcolors.ENDC)
+                else:
+                    print(zone['ZoneName'] + " : " + zone['State'])
+            else:
+                if args.color:
+                    print(zone['ZoneName'] + " : " + bcolors.FAIL + zone['State'] + bcolors.ENDC)
+                else:
+                    print(zone['ZoneName'] + " : " + zone['State'])
+        print('--------------------')
+
+
 def get_instances():
     global ec2data
     ec2data = dict()   # Declare dict to be used for storing instance details later
     ctags = dict()    # Declare dict to store all custom tag key:value pairs
-    
+
     if not args.debug_dict:
         print("REGION\tNAME\tOWNER\tPROJECT\tINSTANCE ID\tINSTANCE TYPE\tLIFECYCLE\tLAUNCH TIME\tSTATE\tLAST TRANSITION\tPRIVATE IP\tPUBLIC IP")
 
     for region in arg_region:
         ec2 = boto3.resource('ec2', str.lower(region))   # Print a delimiter to identify the current region
-        instances = ec2.instances.filter(   # Filter the list of returned instance - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.ServiceResource.instances 
+        instances = ec2.instances.filter(   # Filter the list of returned instance - https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.ServiceResource.instances
             # List of available filters : https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeInstances.html
             Filters=get_filters()
         )
@@ -269,7 +282,7 @@ def get_instances():
                     'Transition Reason': bcolors.WARNING + 'NO_TRANS' + bcolors.ENDC,
                     'Private IP': bcolors.WARNING + 'NO_PRV_IP' + bcolors.ENDC,
                     'Public IP': 'NO_PUB_IP'
-                    }
+                }
             else:
                 ec2data[instance.id] = {
                     'Region': str.lower(region),
@@ -284,9 +297,9 @@ def get_instances():
                     'Transition Reason': 'NO_TRANS',
                     'Private IP': 'NO_PRV_IP',
                     'Public IP': 'NO_PUB_IP'
-                    }
+                }
             tags = instance.tags
-            if tags :
+            if tags:
                 for tag in tags:
                     key = tag['Key']
                     if str.lower(key) == 'name':    # Check for any tags with a value of Name or name
@@ -294,11 +307,11 @@ def get_instances():
                         ec2data[instance.id].update({'Name': name})
                     if str.lower(key) == 'owner':
                         owner = tag['Value']
-                        ec2data[instance.id].update({'Owner' : owner})
+                        ec2data[instance.id].update({'Owner': owner})
                     if str.lower(key) == 'project':
                         project = tag['Value']
-                        ec2data[instance.id].update({'Project' : project})
-    
+                        ec2data[instance.id].update({'Project': project})
+
                     if args.custom_tag:   # Loop over the list of custom tags if present
                         for custom_tag in args.custom_tag:
                             if tag['Key'] == custom_tag:
@@ -308,16 +321,16 @@ def get_instances():
             # Update instance info in dict
             if instance.launch_time:
                 ec2data[instance.id].update({'Launch Time': instance.launch_time.strftime("%m/%d/%Y %H:%M:%S")})
-    
+
             if instance.instance_lifecycle:
                 ec2data[instance.id].update({'Lifecycle': instance.instance_lifecycle})
-    
+
             if instance.public_ip_address:
                 ec2data[instance.id].update({'Public IP': instance.public_ip_address})
-    
+
             if instance.private_ip_address:
                 ec2data[instance.id].update({'Private IP': instance.private_ip_address})
-    
+
             if instance.state['Name']:
                 if instance.state['Name'] == 'terminated':
                     if args.colour:
@@ -331,24 +344,25 @@ def get_instances():
                         ec2data[instance.id].update({'State': instance.state['Name']})   # Highlight stopped instances
                 else:
                     ec2data[instance.id].update({'State': instance.state['Name']})
-    
+
             if instance.state_transition_reason:
-                ec2data[instance.id].update({'Transition Reason' : instance.state_transition_reason})
-    
+                ec2data[instance.id].update({'Transition Reason': instance.state_transition_reason})
+
             if instance.instance_type:
-                ec2data[instance.id].update({'Type' : instance.instance_type})
-    
+                ec2data[instance.id].update({'Type': instance.instance_type})
+
             # Print results line by line
             if not args.debug_dict:
                 data = ec2data[instance.id]
                 print("\t".join(ec2data[instance.id].values()))
+
 
 ##############
 # Do the stuff
 ##############
 instance_print = True
 
-## CONFIRM THE CURRENT VALUES OF EACH ARGUMENT FOR TESTING
+# CONFIRM THE CURRENT VALUES OF EACH ARGUMENT FOR TESTING
 if args.debug_args:
     pp(args)
     print("\n")
