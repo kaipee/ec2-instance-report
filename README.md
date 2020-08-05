@@ -61,6 +61,7 @@ Command-line arguments are available to filter the list of instances or hide/dis
 ### Search Filters
 | Short | Long | Type | Description | Filter Case Sensitivity | Multiple Allowed |
 | :--- | :--- | :--- | :--- | :--- | :--- |
+| -p | --profile | String | Custom AWS profile | N/A | N/A |
 | -c | --lifecycle | Boolean | Return only spot instances | N/A | N/A |
 | -e | --elastic-ip {filter} | String | Return only instances associated with the elastic IP *{filter}* | N/A | No |
 | -f | --private-ip {filter} | String | Return only instances associated with the Private IP *{filter}* | N/A | No |
