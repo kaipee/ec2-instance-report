@@ -37,7 +37,7 @@ sudo chmod 400 ~/.aws/credentials
 
 ## Usage
 
-Simply executing the script will return a full, unfiltered, list of **all EC2 Instances** in **all regions**, grouped by region.
+Simply executing the script will return a full, unfiltered, list of **all EC2 Instances** in **all regions** (that you have access to), grouped by region.
 
 ```bash
 python ec2-instance-report.py
