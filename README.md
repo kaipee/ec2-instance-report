@@ -127,6 +127,9 @@ python ec2-instance-report.py -r us-east-1 -s stopped -s stopping -s shutting-do
 
 ## TODO
 
+## Error handling
+* Notify and move on if Session does not have access to a specific region.
+
 ### Case sensitivity
 Implement case-insensitive filter for the following:
 * Name
