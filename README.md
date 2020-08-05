@@ -43,6 +43,14 @@ Simply executing the script will return a full, unfiltered, list of **all EC2 In
 python ec2-instance-report.py
 ```
 
+### Note
+
+If you see the following error, please confirm you have access to all regions or pass each region that you do have access to as an argument `-r` (multiple regions accepted).
+
+```bash
+botocore.exceptions.ClientError: An error occurred (AuthFailure) when calling the DescribeInstances operation: AWS was not able to validate the provided access credentials
+```
+
 ### Example output without arguments
 
 ```bash
