@@ -15,9 +15,9 @@ This script requires the following packages.
 
 #### Access Key
 
-This script uses access keys from IAM account 'script_ec2instancereport'. The keys are expected to be located in `~/.aws/credentials`.
+This script uses access keys from IAM profile 'script_ec2instancereport' by default. The keys are expected to be located in `~/.aws/credentials`.
 
-1. Obtain the AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY for IAM account `script_ec2instancereport`. *(credentials can be obtained from DevOps team)*
+1. Obtain the AWS_ACCESS_KEY and AWS_SECRET_ACCESS_KEY for IAM profile `script_ec2instancereport`. *(credentials can be obtained from DevOps team)*
 2. Create the boto3 credentials file `~/.aws/credentials` if it does not already exist.
 3. Save the **script_ec2instancereport** IAM account credentials in the following format.
 
