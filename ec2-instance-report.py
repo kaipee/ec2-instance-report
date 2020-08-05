@@ -17,13 +17,6 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
-'''
-Report should be run using restricted IAM Role.
-IAM 'ec2report' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
-'''
-os.environ['AWS_PROFILE'] = 'script_ec2instancereport'   # Define which profile to connect with
-session = boto3.Session(profile_name='script_ec2instancereport')   # Create a boto3 session using the defined profile
-
 ######################
 # Set up the arguments
 ######################
@@ -37,6 +30,7 @@ g_display = parser.add_argument_group('DISPLAY OPTIONS')
 g_debug = parser.add_argument_group('DEBUG')
 
 # Search filters
+g_filters.add_argument("-p", "--profile", type=str, help="Custom AWS profile.")
 g_filters.add_argument("-c", "--lifecycle", action="store_true", help="Only spot instances.")
 g_filters.add_argument("-e", "--elastic-ip", type=str, help="Only instances matching the ELASTIC_IP.")
 g_filters.add_argument("-f", "--private-ip", type=str, help="Only instances matching the PRIVATE_IP. ALWAYS DISPLAYED.")
@@ -72,6 +66,21 @@ g_debug.add_argument("-Z", "--zone-print", action='store_true', help="Print all 
 
 global args
 args = parser.parse_args()
+
+
+# Define the AWS profile to use (default to 'script_ec2instancereport')
+if args.profile:
+    arg_profile = args.profile
+else:
+    arg_profile = 'script_ec2instancereport'
+
+'''
+Report should be run using restricted IAM Role.
+IAM 'script_ec2instancereport' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
+'''
+os.environ['AWS_PROFILE'] = arg_profile   # Define which profile to connect with
+session = boto3.Session(profile_name=arg_profile)   # Create a boto3 session using the defined profile
+
 
 ##############################
 # Define the various functions
