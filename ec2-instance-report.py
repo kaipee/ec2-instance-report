@@ -68,18 +68,18 @@ global args
 args = parser.parse_args()
 
 
+'''
+This Report script should be run using a restricted IAM Role.
+IAM 'script_ec2instancereport' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
+'''
 # Define the AWS profile to use (default to 'script_ec2instancereport')
 if args.profile:
     arg_profile = args.profile
 else:
     arg_profile = 'script_ec2instancereport'
 
-'''
-Report should be run using restricted IAM Role.
-IAM 'script_ec2instancereport' credentials should be stored as a boto3 profile (example: ~/.aws/credentials)
-'''
-os.environ['AWS_PROFILE'] = arg_profile   # Define which profile to connect with
-session = boto3.Session(profile_name=arg_profile)   # Create a boto3 session using the defined profile
+os.environ['AWS_PROFILE'] = arg_profile   # Define which profile to connect with by setting an Environment Variable
+session = boto3.Session()   # Create a boto3 session using the defined profile
 
 
 ##############################
